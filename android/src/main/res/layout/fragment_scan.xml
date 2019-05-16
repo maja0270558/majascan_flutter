@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+
+
+    <!-- 中間包含QRCode等重要資訊的容器 -->
+    <RelativeLayout
+        android:id="@+id/pay_card_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="visible">
+
+        <RelativeLayout
+            android:id="@+id/capture_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/capture_preview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <RelativeLayout
+                android:id="@+id/capture_crop_view"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/qr_code_bg">
+
+                <View
+                    android:id="@+id/scan_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@drawable/scan_bar_gradient"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="請將QR碼放入框內"
+                android:layout_above="@+id/capture_crop_view"
+                android:layout_centerHorizontal="true"
+                android:textColor="#ffffff"
+                android:drawableLeft="@drawable/qr_code"
+                android:layout_marginBottom="15dp"
+                android:drawablePadding="5dp"
+                android:visibility="gone"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@id/capture_crop_view"
+                android:layout_alignBottom="@id/capture_crop_view"
+                android:layout_toLeftOf="@id/capture_crop_view"
+                android:background="#33000000"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@id/capture_crop_view"
+                android:layout_alignBottom="@id/capture_crop_view"
+                android:layout_toRightOf="@id/capture_crop_view"
+                android:background="#33000000"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/mask_top"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/capture_crop_view"
+                android:background="#33000000"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/capture_crop_view"
+                android:background="#33000000"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--<View-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_below="@+id/actionbar"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:layout_marginLeft="4dp"-->
+    <!--android:layout_marginTop="-5dp"-->
+    <!--android:layout_marginRight="4dp"-->
+    <!--android:layout_marginBottom="55dp"-->
+    <!--android:background="@drawable/pay_qrcode_mask" />-->
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/actionbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="#00000000"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="?android:attr/actionBarSize"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:paddingLeft="50dp"
+                android:paddingRight="50dp"
+                android:singleLine="true"
+                android:text="scan qrcode"
+                android:textColor="#ffffff"
+                android:textSize="17sp" />
+
+            <ImageView
+                android:id="@+id/back_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="14dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="14sp"
+                android:src="@drawable/left_arrow" />
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <CheckBox
+        android:id="@+id/toggle_flashlight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:button="@drawable/pay_light"
+        android:scaleX="0.2"
+        android:scaleY="0.2"
+        android:text="@null"
+        android:layout_marginTop="-32dp"
+        android:layout_marginBottom="-32dp"
+        />
+
+</RelativeLayout>
