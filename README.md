@@ -1,1 +1,1 @@
-# majascan_flutter
+# majascan_flutter.
