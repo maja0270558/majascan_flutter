@@ -10,4 +10,9 @@ class Majascan {
     final String version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
+
+  static Future<String> get scanResult async {
+    final String result = await _channel.invokeMethod('getScanResult');
+    return result;
+  }
 }
