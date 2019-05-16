@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">G_scanner</string>
+    <string name="scanner_title">掃瞄QR碼</string>
+    <string name="camera_permission_tips">請開啟相機權限才能使用掃瞄QR-code</string>
+    <string name="go_to_webview">是否立即前往！</string>
+    <string name="dialog_btn_go">前往</string>
+    <string name="dialog_btn_cancel">取消</string>
+</resources>
