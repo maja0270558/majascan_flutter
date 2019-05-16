@@ -4,53 +4,66 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:majascan/majascan.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
+    ));
 
-class MyApp extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  HomePageState createState() {
+    return new HomePageState();
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+class HomePageState extends State<HomePage> {
+  String result = "Hey there !";
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
+  Future _scanQR() async {
     try {
-      platformVersion = await Majascan.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      String qrResult = await Majascan.scan;
+      setState(() {
+        result = qrResult;
+      });
+    } on PlatformException catch (ex) {
+      if (ex.code == Majascan.CameraAccessDenied) {
+        setState(() {
+          result = "Camera permission was denied";
+        });
+      } else {
+        setState(() {
+          result = "Unknown Error $ex";
+        });
+      }
+    } on FormatException {
+      setState(() {
+        result = "You pressed the back button before scanning anything";
+      });
+    } catch (ex) {
+      setState(() {
+        result = "Unknown Error $ex";
+      });
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("QR Scanner"),
+      ),
+      body: Center(
+        child: Text(
+          result,
+          style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: Icon(Icons.camera_alt),
+        label: Text("Scan"),
+        onPressed: _scanQR,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
