@@ -15,7 +15,6 @@ public class SwiftMajascanPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        result("iOS " + UIDevice.current.systemVersion)
         switch call.method {
         case "scan":
             self.result = result
@@ -34,10 +33,13 @@ public class SwiftMajascanPlugin: NSObject, FlutterPlugin {
 
 extension SwiftMajascanPlugin: MAJAScannerDelegate {
     func didScanBarcodeWithResult(code: String) {
-        result?(code)
+        if let channelResult = result {
+            channelResult(code as NSString)
+        }
     }
     
     func didFailWithErrorCode(code: String) {
-        result?(code)
-    }
+        if let channelResult = result {
+            channelResult(code as NSString)
+        }    }
 }

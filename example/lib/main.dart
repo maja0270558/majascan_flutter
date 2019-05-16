@@ -22,6 +22,7 @@ class HomePageState extends State<HomePage> {
   Future _scanQR() async {
     try {
       String qrResult = await Majascan.scan;
+      print(qrResult);
       setState(() {
         result = qrResult;
       });
