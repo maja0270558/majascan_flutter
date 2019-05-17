@@ -30,6 +30,9 @@ class HomePageState extends State<HomePage> {
       scanArgs[ScanArgs.BAR_COLOR] = "FFff8800";
 
       String qrResult = await MajaScan.startScan(scanArgs);
+
+      print(qrResult);
+
       setState(() {
         result = qrResult;
       });

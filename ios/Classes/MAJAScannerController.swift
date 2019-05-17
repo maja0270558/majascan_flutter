@@ -7,16 +7,21 @@ protocol MAJAScannerDelegate: class {
     func didFailWithErrorCode(code: String)
 }
 
-public class MAJAScannerController: UIViewController {
+class MAJAScannerController: UIViewController {
     weak var delegate: MAJAScannerDelegate?
     var captureSession: AVCaptureSession!
     var metadataOutput: AVCaptureMetadataOutput!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var crosshairView: CrosshairView? = nil
     
+    let backButton: UIButton = UIButton(type: .custom)
+    let flashlightButton: UIButton = UIButton(type: .custom)
+
+    let navButtonFrame = CGRect(x: 0, y: 0, width: 20 , height: 20)
+
     @IBOutlet weak var previewView: UIView!
     
-    public init() {
+    init() {
         super.init(nibName: "MAJAScannerController", bundle: Bundle(for: MAJAScannerController.self))
     }
     
@@ -24,10 +29,97 @@ public class MAJAScannerController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override public func viewDidLoad() {
+    private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
+        
+        layer.videoOrientation = orientation
+        
+        previewLayer.frame = self.view.bounds
+    }
+    
+    override  func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let connection =  self.previewLayer?.connection  {
+            
+            let currentDevice: UIDevice = UIDevice.current
+            
+            let orientation: UIDeviceOrientation = currentDevice.orientation
+            
+            let previewLayerConnection : AVCaptureConnection = connection
+            
+            if previewLayerConnection.isVideoOrientationSupported {
+                
+                switch (orientation) {
+                case .portrait: updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+                    break
+                case .landscapeRight: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
+                    break
+                case .landscapeLeft: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
+                    break
+                case .portraitUpsideDown: updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
+                    break
+                default: updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+                    break
+                }
+            }
+        }
+    }
+    
+    @objc func backAction() -> Void {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func flashlightAction () -> Void {
+        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+        guard device.hasTorch else { return }
+        do {
+            try device.lockForConfiguration()
+            
+            if (device.torchMode == AVCaptureDevice.TorchMode.on) {
+                device.torchMode = AVCaptureDevice.TorchMode.off
+                flashlightButton.isSelected = false
+            } else {
+                do {
+                    try device.setTorchModeOn(level: 1.0)
+                    flashlightButton.isSelected = true
+                } catch {
+                    print(error)
+                }
+            }
+            
+            device.unlockForConfiguration()
+        } catch {
+            print(error)
+        }
+    }
+    
+    override  func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         captureSession = AVCaptureSession()
+        
+        backButton.setImage(UIImage(named: "back"), for: .normal)
+        backButton.setTitle("", for: .normal)
+        backButton.setTitleColor(backButton.tintColor, for: .normal)
+        backButton.addTarget(self, action: #selector(backAction), for: .touchUpInside)
+        backButton.imageView?.contentMode = .scaleAspectFit
+        backButton.frame = navButtonFrame
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        
+        let flashlightImage = UIImage(named: "flashlight")!
+        
+        flashlightButton.setImage(flashlightImage, for: .normal)
+        flashlightButton.setImage(flashlightImage.maskWithColor(color: UIColor.yellow), for: .selected)
+        flashlightButton.setTitle("", for: .normal)
+        flashlightButton.setTitleColor(flashlightButton.tintColor, for: .normal)
+        flashlightButton.addTarget(self, action: #selector(flashlightAction), for: .touchUpInside)
+        flashlightButton.imageView?.contentMode = .scaleAspectFit
+        flashlightButton.frame = navButtonFrame
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: flashlightButton)
+        
+        self.navigationItem.title = "掃描 QRcode"
+        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.white]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
         
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
         
@@ -66,7 +158,9 @@ public class MAJAScannerController: UIViewController {
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         captureSession = nil
+        delegate?.didFailWithErrorCode(code: "Your device does not support scanning a code from an item. Please use a device with a camera.")
         self.dismiss(animated: true, completion: nil)
+        
     }
     
     func success() {
@@ -74,10 +168,12 @@ public class MAJAScannerController: UIViewController {
         
         let cancelAction = UIAlertAction(title: "取消", style: .default) { (action) in
             self.captureSession.startRunning()
+
         }
         
         let confirmAction = UIAlertAction(title: "前往", style: .default) { (action) in
             self.captureSession.startRunning()
+            self.dismiss(animated: true, completion: nil)
         }
         
         ac.addAction(cancelAction)
@@ -85,7 +181,7 @@ public class MAJAScannerController: UIViewController {
         present(ac, animated: true)
     }
     
-    override public func viewWillAppear(_ animated: Bool) {
+    override  func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         
@@ -100,90 +196,30 @@ public class MAJAScannerController: UIViewController {
             previewLayer.videoGravity = .resizeAspectFill
             previewView.layer.addSublayer(previewLayer)
             
-            /// background inverse mask
-            let backgroundView = UIView(frame: self.previewView.bounds)
-            backgroundView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
+            
+            /// overlay rect
+            crosshairView = CrosshairView(frame: UIScreen.main.bounds)
+            self.previewView.addSubview(crosshairView!)
+            crosshairView?.autoLayout.fillSuperview()
             
             
-            let fWidth = self.previewView.bounds.width
-            let fHeight = self.previewView.bounds.size.height
-            let squareWidth = fWidth * 0.7
-            let targetRect = CGRect(x: fWidth/2-squareWidth/2, y: fHeight/2-squareWidth/2, width: squareWidth, height: squareWidth)
-            
-            let topLeft = CGPoint(x: fWidth/2-squareWidth/2, y: fHeight/2-squareWidth/2)
-            
-            let bottomLeft = CGPoint(x: fWidth/2-squareWidth/2, y: fHeight/2+squareWidth/2)
-            
-            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: targetRect)
-            
-            guard let output = metadataOutput else {
+            /// let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: targetRect)
+            guard metadataOutput != nil else {
                 failed()
                 return
             }
-            output.rectOfInterest = rectOfInterest
-            
-            mask(viewToMask: backgroundView, maskRect: targetRect)
-            self.previewView.addSubview(backgroundView)
-            
-            
-            /// orange rect
-            crosshairView = CrosshairView(frame: previewView.bounds)
-            crosshairView?.backgroundColor = UIColor.clear
-            self.previewView.addSubview(crosshairView!)
-            
-            /// scanner line
-            let scannerView = UIView(frame: CGRect(x: topLeft.x, y: topLeft.y , width: squareWidth, height: 2))
-            let gradientLayer = CAGradientLayer()
-            gradientLayer.startPoint = CGPoint.zero
-            gradientLayer.endPoint = CGPoint(x: 1, y: 0)
-            gradientLayer.frame = scannerView.bounds
-            
-            gradientLayer.colors = [UIColor.orange.cgColor, UIColor.white.cgColor,UIColor.orange.cgColor]
-            
-            scannerView.layer.addSublayer(gradientLayer)
-            UIView.animate(withDuration: 1, delay: 0, options: [.repeat, .autoreverse], animations: {
-                scannerView.frame.origin = CGPoint(x: bottomLeft.x, y: bottomLeft.y )
-            }, completion: nil)
-            
-            self.previewView.addSubview(scannerView)
-            scannerView.bringSubview(toFront: self.previewView)
         }
         
     }
     
-    func mask(viewToMask: UIView, maskRect: CGRect, invert: Bool = true) {
-        let maskLayer = CAShapeLayer()
-        let path = CGMutablePath()
-        if (invert) {
-            path.addRect(viewToMask.bounds)
-        }
-        path.addRect(maskRect)
-        
-        maskLayer.path = path
-        if (invert) {
-            maskLayer.fillRule = kCAFillRuleEvenOdd
-        }
-        
-        // Set the mask of the view.
-        viewToMask.layer.mask = maskLayer;
-    }
-    
-    override public func viewWillDisappear(_ animated: Bool) {
+    override  func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         if (captureSession?.isRunning == true) {
             captureSession.stopRunning()
         }
     }
-    
-    func found(code: String) {
-        print(code)
-    }
-    
-    override public var prefersStatusBarHidden: Bool {
-        return true
-    }
-    
+
     override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .portrait
     }
@@ -197,9 +233,9 @@ extension MAJAScannerController: AVCaptureMetadataOutputObjectsDelegate{
             guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
             guard let stringValue = readableObject.stringValue else { return }
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-            found(code: stringValue)
+            delegate?.didScanBarcodeWithResult(code: stringValue)
+            self.dismiss(animated: true, completion: nil)
         }
-        success()
     }
     
 }

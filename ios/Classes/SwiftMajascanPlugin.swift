@@ -15,13 +15,17 @@ public class SwiftMajascanPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        result("iOS " + UIDevice.current.systemVersion)
         switch call.method {
         case "scan":
             self.result = result
             let scanController = MAJAScannerController()
             scanController.delegate = self
             let navigationController = UINavigationController(rootViewController: scanController)
+            navigationController.navigationBar.backgroundColor = UIColor.clear
+            navigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+            navigationController.navigationBar.shadowImage = UIImage()
+//            navigationController.navigationBar.isTranslucent = true
+           
             if hostViewController != nil {
                 hostViewController.present(navigationController, animated: true, completion: nil)
             }
@@ -34,10 +38,13 @@ public class SwiftMajascanPlugin: NSObject, FlutterPlugin {
 
 extension SwiftMajascanPlugin: MAJAScannerDelegate {
     func didScanBarcodeWithResult(code: String) {
-        result?(code)
+        if let channelResult = result {
+            channelResult(code as NSString)
+        }
     }
     
     func didFailWithErrorCode(code: String) {
-        result?(code)
-    }
+        if let channelResult = result {
+            channelResult(code as NSString)
+        }    }
 }
