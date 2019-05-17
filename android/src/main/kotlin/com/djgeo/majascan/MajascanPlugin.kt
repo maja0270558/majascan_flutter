@@ -3,7 +3,6 @@ package com.djgeo.majascan
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.support.v4.app.ActivityCompat.startActivityForResult
 import com.djgeo.majascan.g_scanner.QrCodeScannerActivity
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
