@@ -30,6 +30,11 @@ class CrosshairView: UIView {
     var bottomRight: CGPoint {
         return CGPoint(x: UIScreen.main.bounds.width/2+squareWidth/2, y: UIScreen.main.bounds.height/2+squareWidth/2)
     }
+    
+    var squareRect: CGRect {
+        return CGRect(x: topLeft.x, y: topLeft.y, width: squareWidth, height: squareWidth)
+    }
+    
     var backgroundView = UIView()
     var backgroundMaskLayer = CAShapeLayer()
     var scanView = UIView(frame: CGRect.zero)

@@ -18,14 +18,16 @@ public class SwiftMajascanPlugin: NSObject, FlutterPlugin {
         switch call.method {
         case "scan":
             self.result = result
+         
             let scanController = MAJAScannerController()
             scanController.delegate = self
+          
             let navigationController = UINavigationController(rootViewController: scanController)
-            navigationController.navigationBar.backgroundColor = UIColor.clear
-            navigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
-            navigationController.navigationBar.shadowImage = UIImage()
-//            navigationController.navigationBar.isTranslucent = true
-           
+            
+            if let arguDictinary = call.arguments as? NSDictionary {
+               scanController.argumentDictionary = arguDictinary
+            }
+    
             if hostViewController != nil {
                 hostViewController.present(navigationController, animated: true, completion: nil)
             }
