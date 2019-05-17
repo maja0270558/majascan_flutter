@@ -41,6 +41,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:26.0.1'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 }

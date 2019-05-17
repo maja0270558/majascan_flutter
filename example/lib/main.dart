@@ -27,7 +27,9 @@ class HomePageState extends State<HomePage> {
       //test
       scanArgs[ScanArgs.TITLE] = "你媽超牛逼";
       scanArgs[ScanArgs.FLASHLIGHT] = "0";
-      scanArgs[ScanArgs.BAR_COLOR] = "FFff8800";
+      scanArgs[ScanArgs.BAR_COLOR] = "#090df7";
+      scanArgs[ScanArgs.TITLE_COLOR] = "#00ff00";
+
 
       String qrResult = await MajaScan.startScan(scanArgs);
 

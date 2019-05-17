@@ -3,14 +3,16 @@ package com.djgeo.majascan.g_scanner;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.djgeo.majascan.R;
 
@@ -24,6 +26,7 @@ public class QrCodeScannerActivity extends AppCompatActivity {
     //key from flutter
     public static final String FLASHLIGHT = "FLASHLIGHT";
     public static final String TITLE = "TITLE";
+    public static final String TITLE_COLOR = "TITLE_COLOR";
     public static final String BAR_COLOR = "BAR_COLOR";
 
     @Override
@@ -40,7 +43,9 @@ public class QrCodeScannerActivity extends AppCompatActivity {
                 orientation == Configuration.ORIENTATION_PORTRAIT ?
                         ActivityInfo.SCREEN_ORIENTATION_PORTRAIT :
                         ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
-        );//鎖定直屏
+        );
+        //鎖定螢幕
+
 //        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 
 
@@ -71,9 +76,19 @@ public class QrCodeScannerActivity extends AppCompatActivity {
         //toolbar顏色
         int toolbarColor = 0;
         String stringBarColor = intent.getStringExtra(BAR_COLOR);
-        if (!TextUtils.isEmpty(stringBarColor)) {
+        if (!TextUtils.isEmpty(stringBarColor) && stringBarColor.indexOf("#") == 0) {
             try {
-                toolbarColor = (int) Long.parseLong(stringBarColor, 16);
+                toolbarColor = Color.parseColor(stringBarColor);
+            } catch (Exception e) {
+                Log.e("QrCodeScannerActivity", "parse color code error:" + e);
+            }
+        }
+
+        int titleColor = 0;
+        String stringTitleColor = intent.getStringExtra(TITLE_COLOR);
+        if (!TextUtils.isEmpty(stringTitleColor) && stringTitleColor.indexOf("#") == 0) {
+            try {
+                titleColor = Color.parseColor(stringTitleColor);
             } catch (Exception e) {
                 Log.e("QrCodeScannerActivity", "parse color code error:" + e);
             }
@@ -82,7 +97,8 @@ public class QrCodeScannerActivity extends AppCompatActivity {
         ScanFragment scanFragment = ScanFragment.newInstance(
                 intent.getStringExtra(TITLE),
                 hasFlashLight,
-                toolbarColor
+                toolbarColor,
+                titleColor
         );
 
         if (fm != null) {

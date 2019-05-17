@@ -2,13 +2,10 @@ package com.djgeo.majascan.g_scanner;
 
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +15,15 @@ import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 
 import com.djgeo.majascan.R;
 
@@ -36,10 +41,13 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
     private CheckBox mFlashlightBtn;
     private TextView mTvTitle;
     private Toolbar mToolbar;
+    private ImageView mBackBtn;
+
     private ScanInteractor scanInteractor;
     private AlertDialog mGoToWebviewDialog;
 
-    public static ScanFragment newInstance(String title, boolean hasFlashLight, int toolBarColor) {
+
+    public static ScanFragment newInstance(String title, boolean hasFlashLight, int toolBarColor, int titleColor) {
 
         Bundle args = new Bundle();
         args.putString(QrCodeScannerActivity.TITLE, title);
@@ -47,6 +55,10 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
 
         if (toolBarColor != 0) {
             args.putInt(QrCodeScannerActivity.BAR_COLOR, toolBarColor);
+        }
+
+        if (titleColor != 0) {
+            args.putInt(QrCodeScannerActivity.TITLE_COLOR, titleColor);
         }
 
 
@@ -87,7 +99,8 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
         });
 
         //關閉按鈕
-        view.findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
+        mBackBtn = view.findViewById(R.id.back_btn);
+        mBackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getActivity() != null) {
@@ -110,6 +123,16 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
             mFlashlightBtn.setVisibility(hasFlashLight ? View.VISIBLE : View.GONE);
 
             mToolbar.setBackgroundColor(args.getInt(QrCodeScannerActivity.BAR_COLOR, android.R.color.transparent));
+
+            int titleColor = args.getInt(QrCodeScannerActivity.TITLE_COLOR, 0);
+            if (titleColor != 0) {
+                Drawable drawable = getResources().getDrawable(R.drawable.left_arrow);
+                drawable.setColorFilter(new PorterDuffColorFilter(titleColor, PorterDuff.Mode.MULTIPLY));
+                mBackBtn.setImageDrawable(drawable);
+
+                mTvTitle.setTextColor(titleColor);
+            }
+
         }
     }
 
@@ -120,7 +143,8 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           int[] grantResults) {
         if (requestCode == REQUEST_CAMERA) {
             if (grantResults.length > 0) {
                 boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
