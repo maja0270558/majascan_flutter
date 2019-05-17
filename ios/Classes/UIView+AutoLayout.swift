@@ -200,34 +200,3 @@ extension UIView {
 }
 
 
-extension CGPoint {
-    
-     func move(x:CGFloat? = nil, y:CGFloat? = nil) -> CGPoint {
-        var tempCopy = self
-        if let x = x {
-            tempCopy.x += x
-        }
-        
-        if let y = y {
-            tempCopy.y += y
-        }
-        
-        return tempCopy
-    }
-    
-     func up(y:CGFloat) -> CGPoint {
-        return move(y: -y)
-    }
-    
-     func down(y:CGFloat) -> CGPoint {
-        return move(y: y)
-    }
-    
-     func left(x:CGFloat) -> CGPoint {
-        return move(x: -x)
-    }
-    
-     func right(x:CGFloat) -> CGPoint {
-        return move(x: x)
-    }
-}

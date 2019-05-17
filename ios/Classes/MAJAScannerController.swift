@@ -14,6 +14,11 @@ class MAJAScannerController: UIViewController {
     var previewLayer: AVCaptureVideoPreviewLayer!
     var crosshairView: CrosshairView? = nil
     
+    let backButton: UIButton = UIButton(type: .custom)
+    let flashlightButton: UIButton = UIButton(type: .custom)
+
+    let navButtonFrame = CGRect(x: 0, y: 0, width: 20 , height: 20)
+
     @IBOutlet weak var previewView: UIView!
     
     init() {
@@ -60,11 +65,61 @@ class MAJAScannerController: UIViewController {
         }
     }
     
+    @objc func backAction() -> Void {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func flashlightAction () -> Void {
+        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+        guard device.hasTorch else { return }
+        do {
+            try device.lockForConfiguration()
+            
+            if (device.torchMode == AVCaptureDevice.TorchMode.on) {
+                device.torchMode = AVCaptureDevice.TorchMode.off
+                flashlightButton.isSelected = false
+            } else {
+                do {
+                    try device.setTorchModeOn(level: 1.0)
+                    flashlightButton.isSelected = true
+                } catch {
+                    print(error)
+                }
+            }
+            
+            device.unlockForConfiguration()
+        } catch {
+            print(error)
+        }
+    }
     
     override  func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         captureSession = AVCaptureSession()
+        
+        backButton.setImage(UIImage(named: "back"), for: .normal)
+        backButton.setTitle("", for: .normal)
+        backButton.setTitleColor(backButton.tintColor, for: .normal)
+        backButton.addTarget(self, action: #selector(backAction), for: .touchUpInside)
+        backButton.imageView?.contentMode = .scaleAspectFit
+        backButton.frame = navButtonFrame
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        
+        let flashlightImage = UIImage(named: "flashlight")!
+        
+        flashlightButton.setImage(flashlightImage, for: .normal)
+        flashlightButton.setImage(flashlightImage.maskWithColor(color: UIColor.yellow), for: .selected)
+        flashlightButton.setTitle("", for: .normal)
+        flashlightButton.setTitleColor(flashlightButton.tintColor, for: .normal)
+        flashlightButton.addTarget(self, action: #selector(flashlightAction), for: .touchUpInside)
+        flashlightButton.imageView?.contentMode = .scaleAspectFit
+        flashlightButton.frame = navButtonFrame
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: flashlightButton)
+        
+        self.navigationItem.title = "掃描 QRcode"
+        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.white]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
         
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
         

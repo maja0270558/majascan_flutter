@@ -21,6 +21,11 @@ public class SwiftMajascanPlugin: NSObject, FlutterPlugin {
             let scanController = MAJAScannerController()
             scanController.delegate = self
             let navigationController = UINavigationController(rootViewController: scanController)
+            navigationController.navigationBar.backgroundColor = UIColor.clear
+            navigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+            navigationController.navigationBar.shadowImage = UIImage()
+//            navigationController.navigationBar.isTranslucent = true
+           
             if hostViewController != nil {
                 hostViewController.present(navigationController, animated: true, completion: nil)
             }

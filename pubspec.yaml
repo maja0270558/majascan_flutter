@@ -1,8 +1,8 @@
 name: majascan
-description: A new flutter plugin project.
+description: A scanner for flutter plugin project.
 version: 0.0.1
-author:
-homepage:
+author: django <maja0270558@gmail.com>
+homepage: https://maja0270558.github.io/majascan_flutter/.
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
