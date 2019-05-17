@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -19,9 +20,11 @@ public class QrCodeScannerActivity extends AppCompatActivity {
 
     //bundle key
     public static final String BUNDLE_SCAN_CALLBACK = "BUNDLE_SCAN_CALLBACK";
-    public static final String BUNDLE_HAS_FLASHLIGHT = "BUNDLE_HAS_FLASHLIGHT";
-    public static final String BUNDLE_WEBVIEW_TITLE = "BUNDLE_WEBVIEW_TITLE";
-    public static final String BUNDLE_TITLE = "BUNDLE_TITLE";
+
+    //key from flutter
+    public static final String FLASHLIGHT = "FLASHLIGHT";
+    public static final String TITLE = "TITLE";
+    public static final String BAR_COLOR = "BAR_COLOR";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,8 @@ public class QrCodeScannerActivity extends AppCompatActivity {
                         ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
         );//鎖定直屏
 //        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+
+
     }
 
 
@@ -56,11 +61,30 @@ public class QrCodeScannerActivity extends AppCompatActivity {
     public void goToScanFragment() {
         Intent intent = getIntent();
         FragmentManager fm = getSupportFragmentManager();
+
+        //是否有閃光燈按鈕
+        boolean hasFlashLight = true;
+        if ("0".equals(intent.getStringExtra(FLASHLIGHT))) {
+            hasFlashLight = false;
+        }
+
+        //toolbar顏色
+        int toolbarColor = 0;
+        String stringBarColor = intent.getStringExtra(BAR_COLOR);
+        if (!TextUtils.isEmpty(stringBarColor)) {
+            try {
+                toolbarColor = (int) Long.parseLong(stringBarColor, 16);
+            } catch (Exception e) {
+                Log.e("QrCodeScannerActivity", "parse color code error:" + e);
+            }
+        }
+
         ScanFragment scanFragment = ScanFragment.newInstance(
-                intent.getStringExtra(BUNDLE_WEBVIEW_TITLE),
-                intent.getBooleanExtra(BUNDLE_HAS_FLASHLIGHT, true),
-                intent.getStringExtra(BUNDLE_TITLE)
+                intent.getStringExtra(TITLE),
+                hasFlashLight,
+                toolbarColor
         );
+
         if (fm != null) {
             fm.beginTransaction()
                     .replace(R.id.fragment_container, scanFragment, ScanFragment.class.getSimpleName())
@@ -77,7 +101,7 @@ public class QrCodeScannerActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        //攔截back鍵事件，如果是在webViewFragment就強制finish();
+        //攔截back鍵事件，如果是在ScanFragment就強制finish();
         if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
             FragmentManager fm = getSupportFragmentManager();
             if (fm != null) {

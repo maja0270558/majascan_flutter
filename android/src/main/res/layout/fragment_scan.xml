@@ -8,8 +8,6 @@
     >
 
 
-
-
     <!-- 中間包含QRCode等重要資訊的容器 -->
     <RelativeLayout
         android:id="@+id/pay_card_container"

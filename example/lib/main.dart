@@ -21,12 +21,20 @@ class HomePageState extends State<HomePage> {
 
   Future _scanQR() async {
     try {
-      String qrResult = await Majascan.scan;
+
+      Map<String, String> scanArgs = {};
+
+      //test
+      scanArgs[ScanArgs.TITLE] = "你媽超牛逼";
+      scanArgs[ScanArgs.FLASHLIGHT] = "0";
+      scanArgs[ScanArgs.BAR_COLOR] = "FFff8800";
+
+      String qrResult = await MajaScan.startScan(scanArgs);
       setState(() {
         result = qrResult;
       });
     } on PlatformException catch (ex) {
-      if (ex.code == Majascan.CameraAccessDenied) {
+      if (ex.code == MajaScan.CameraAccessDenied) {
         setState(() {
           result = "Camera permission was denied";
         });

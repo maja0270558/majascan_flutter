@@ -2,13 +2,13 @@ package com.djgeo.majascan.g_scanner;
 
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +23,8 @@ import android.widget.TextView;
 import com.djgeo.majascan.R;
 
 import static android.Manifest.permission.CAMERA;
-import static com.djgeo.majascan.g_scanner.PermissionUtil.Permission_denied;
 import static com.djgeo.majascan.g_scanner.PermissionUtil.Permission_denied_forever;
 import static com.djgeo.majascan.g_scanner.PermissionUtil.Permission_granted;
-import static com.djgeo.majascan.g_scanner.QrCodeScannerActivity.BUNDLE_HAS_FLASHLIGHT;
-import static com.djgeo.majascan.g_scanner.QrCodeScannerActivity.BUNDLE_TITLE;
-import static com.djgeo.majascan.g_scanner.QrCodeScannerActivity.BUNDLE_WEBVIEW_TITLE;
 import static com.djgeo.majascan.g_scanner.QrCodeScannerActivity.REQUEST_CAMERA;
 
 public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCallbackInterface {
@@ -39,18 +35,25 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
     private View mScannerBar;
     private CheckBox mFlashlightBtn;
     private TextView mTvTitle;
+    private Toolbar mToolbar;
     private ScanInteractor scanInteractor;
     private AlertDialog mGoToWebviewDialog;
 
-    public static ScanFragment newInstance(String webTitle, boolean hasFlashLight, String title) {
+    public static ScanFragment newInstance(String title, boolean hasFlashLight, int toolBarColor) {
 
         Bundle args = new Bundle();
-        args.putString(BUNDLE_WEBVIEW_TITLE, webTitle);
-        args.putBoolean(BUNDLE_HAS_FLASHLIGHT, hasFlashLight);
-        args.putString(BUNDLE_TITLE, title);
+        args.putString(QrCodeScannerActivity.TITLE, title);
+        args.putBoolean(QrCodeScannerActivity.FLASHLIGHT, hasFlashLight);
+
+        if (toolBarColor != 0) {
+            args.putInt(QrCodeScannerActivity.BAR_COLOR, toolBarColor);
+        }
+
+
         ScanFragment fragment = new ScanFragment();
         fragment.setArguments(args);
         return fragment;
+
     }
 
     @Nullable
@@ -67,6 +70,7 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
         mCapturePreview = view.findViewById(R.id.capture_preview);
         mScannerBar = view.findViewById(R.id.scan_bar);
         mTvTitle = view.findViewById(R.id.tv_title);
+        mToolbar = view.findViewById(R.id.actionbar);
 
         //閃光燈
         mFlashlightBtn = view.findViewById(R.id.toggle_flashlight);
@@ -98,14 +102,14 @@ public class ScanFragment extends Fragment implements ScanInteractorImpl.ScanCal
     private void handleBundleData() {
         Bundle args = getArguments();
         if (args != null) {
-
-            mWebTitle = args.getString(BUNDLE_WEBVIEW_TITLE, "");
-
-            String title = args.getString(BUNDLE_TITLE, getString(R.string.scanner_title));
+//            mWebTitle = args.getString(BUNDLE_WEBVIEW_TITLE, "");
+            String title = args.getString(QrCodeScannerActivity.TITLE, getString(R.string.scanner_title));
             mTvTitle.setText(title);
 
-            boolean hasFlashLight = args.getBoolean(BUNDLE_HAS_FLASHLIGHT, true);
+            boolean hasFlashLight = args.getBoolean(QrCodeScannerActivity.FLASHLIGHT, true);
             mFlashlightBtn.setVisibility(hasFlashLight ? View.VISIBLE : View.GONE);
+
+            mToolbar.setBackgroundColor(args.getInt(QrCodeScannerActivity.BAR_COLOR, android.R.color.transparent));
         }
     }
 

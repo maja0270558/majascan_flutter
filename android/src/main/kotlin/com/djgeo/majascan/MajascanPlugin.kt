@@ -30,13 +30,16 @@ class MajascanPlugin(activity: Activity) : MethodCallHandler, PluginRegistry.Act
     }
 
     private var activity: Activity? = activity
-    private var mResult : Result? = null
+    private var mResult: Result? = null
 
     override fun onMethodCall(call: MethodCall, result: Result) {
+
         when (call.method) {
             SCANRESULT -> {
+                val args: Map<String, String>? = call.arguments()
                 activity?.let {
                     val intent = Intent(it, QrCodeScannerActivity::class.java)
+                    args?.keys?.map { key -> intent.putExtra(key, args[key]) }
                     it.startActivityForResult(intent, Request_Scan)
                     mResult = result
                 }

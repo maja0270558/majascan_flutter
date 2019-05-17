@@ -16,8 +16,6 @@ import android.widget.TextView;
 
 import com.djgeo.majascan.R;
 
-import static com.djgeo.majascan.g_scanner.QrCodeScannerActivity.BUNDLE_WEBVIEW_TITLE;
-
 public class WebViewFragment extends Fragment {
 
     public static final String BUNDLE_URL = "BUNDLE_URL";
@@ -26,7 +24,7 @@ public class WebViewFragment extends Fragment {
     public static WebViewFragment newInstance(String url, String title) {
         Bundle args = new Bundle();
         args.putString(BUNDLE_URL, url);
-        args.putString(BUNDLE_WEBVIEW_TITLE, title);
+//        args.putString(BUNDLE_WEBVIEW_TITLE, title);
         WebViewFragment fragment = new WebViewFragment();
         fragment.setArguments(args);
         return fragment;
@@ -63,7 +61,7 @@ public class WebViewFragment extends Fragment {
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-            tvTitle.setText(bundle.getString(BUNDLE_WEBVIEW_TITLE, ""));
+//            tvTitle.setText(bundle.getString(BUNDLE_WEBVIEW_TITLE, ""));
             progressBar.getProgressDrawable().setColorFilter(
                     Color.rgb(50, 150, 251), android.graphics.PorterDuff.Mode.SRC_IN);//設定進度條的顏色
             webView.setWebChromeClient(new WebChromeClient() {
