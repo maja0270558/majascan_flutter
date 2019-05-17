@@ -35,7 +35,7 @@ class MAJAScannerController: UIViewController {
     let flashlightButton: UIButton = UIButton(type: .custom)
     let navButtonFrame = CGRect(x: 0, y: 0, width: 20 , height: 20)
     var tintColor: UIColor = UIColor.white
-    var navigationBarColor: UIColor = UIColor.clear
+    var barColor: UIColor = UIColor.clear
     var barTitle: String = "掃描 QRcode"
     var flashLightEnable: Bool = true
     
@@ -48,12 +48,13 @@ class MAJAScannerController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         settingArgumentValue()
-        configureNavigationBar()
         captureSessionInit()
     }
     
     override  func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        configureNavigationBar()
+
         if (captureSession?.isRunning == false) {
             captureSession.startRunning()
         }
@@ -85,6 +86,7 @@ class MAJAScannerController: UIViewController {
     
     override  func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+
         if let connection =  self.previewLayer?.connection  {
             let currentDevice: UIDevice = UIDevice.current
             let orientation: UIDeviceOrientation = currentDevice.orientation
@@ -157,31 +159,34 @@ class MAJAScannerController: UIViewController {
     
     func settingArgumentValue() {
         if let tintColorHex: String = MAJAScanArguKey.titleColor.getKeyValue(dictionary: argumentDictionary)  {
-            tintColor = tintColorHex.hexStringToUIColor()
+            tintColor = UIColor(hexString: tintColorHex) ?? UIColor.white
         }
         
         if let barColorHex: String = MAJAScanArguKey.barColor.getKeyValue(dictionary: argumentDictionary)  {
             print(barColorHex)
-            navigationBarColor = "#5bc1b7".hexStringToUIColor()
+            barColor = UIColor(hexString: barColorHex) ?? UIColor.clear
         }
         
         if let newBarTitle: String = MAJAScanArguKey.title.getKeyValue(dictionary: argumentDictionary)  {
             barTitle = newBarTitle
         }
         
-        if let flashLightEnableInt: Int = MAJAScanArguKey.flashLightEnable.getKeyValue(dictionary: argumentDictionary)  {
-            flashLightEnable = flashLightEnableInt == 0 ? false : true
+        if let flashLightEnableString: String = MAJAScanArguKey.flashLightEnable.getKeyValue(dictionary: argumentDictionary), let enableInt = Int(flashLightEnableString)  {
+            
+            flashLightEnable = enableInt == 0 ? false : true
         }
     }
     
     
     func configureNavigationBar() {
-        self.navigationController?.navigationBar.tintColor = navigationBarColor
-        if navigationBarColor == UIColor.clear {
+        self.navigationController?.navigationBar.barTintColor = barColor
+
+        if barColor == UIColor.clear {
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
             self.navigationController?.navigationBar.shadowImage = UIImage()
             self.navigationController?.navigationBar.isTranslucent = true
         }
+     
 
         let backImage = UIImage(named: "back")
         
