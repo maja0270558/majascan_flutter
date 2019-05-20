@@ -37,20 +37,16 @@ public class QrCodeScannerActivity extends AppCompatActivity {
 
         goToScanFragment();
 
+        //鎖定螢幕
         int orientation = getResources().getConfiguration().orientation;
         Log.d("QrCodeScannerActivity", "QrCodeScannerActivity:" + orientation);
         setRequestedOrientation(
                 orientation == Configuration.ORIENTATION_PORTRAIT ?
                         ActivityInfo.SCREEN_ORIENTATION_PORTRAIT :
-                        ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
+                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         );
-        //鎖定螢幕
-
-//        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-
 
     }
-
 
     public void goToWebviewFragment(final String url, final String webTitle) {
         FragmentManager fm = getSupportFragmentManager();
