@@ -54,7 +54,7 @@ class MAJAScannerController: UIViewController {
     override  func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
-
+        
         if (captureSession?.isRunning == false) {
             captureSession.startRunning()
         }
@@ -68,12 +68,13 @@ class MAJAScannerController: UIViewController {
             crosshairView = CrosshairView(frame: UIScreen.main.bounds)
             previewView.addSubview(crosshairView!)
             crosshairView.autoLayout.fillSuperview()
-            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: crosshairView.squareRect)
             guard let output = metadataOutput else {
                 failed()
                 return
             }
-            output.rectOfInterest = rectOfInterest
+            /// Rect limit
+            //            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: crosshairView.squareRect)
+            //            output.rectOfInterest = rectOfInterest
         }
     }
     
@@ -86,7 +87,7 @@ class MAJAScannerController: UIViewController {
     
     override  func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-
+        
         if let connection =  self.previewLayer?.connection  {
             let currentDevice: UIDevice = UIDevice.current
             let orientation: UIDeviceOrientation = currentDevice.orientation
@@ -182,14 +183,13 @@ class MAJAScannerController: UIViewController {
     
     func configureNavigationBar() {
         self.navigationController?.navigationBar.barTintColor = barColor
-
+        
         if barColor == UIColor.clear {
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
             self.navigationController?.navigationBar.shadowImage = UIImage()
             self.navigationController?.navigationBar.isTranslucent = true
         }
-     
-
+        
         let backImage = UIImage(named: "back")
         
         backButton.setImage(backImage?.maskWithColor(color: tintColor), for: .normal)
