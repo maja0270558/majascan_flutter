@@ -201,9 +201,9 @@ class MAJAScannerController: UIViewController {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         
         if flashLightEnable {
-            let flashlightImage = UIImage(named: "flashlight")!
-            flashlightButton.setImage(flashlightImage.maskWithColor(color: tintColor), for: .normal)
-            flashlightButton.setImage(flashlightImage.maskWithColor(color: UIColor.yellow), for: .selected)
+            let flashlightImage = UIImage(named: "flashlight")
+            flashlightButton.setImage(flashlightImage?.maskWithColor(color: tintColor), for: .normal)
+            flashlightButton.setImage(flashlightImage?.maskWithColor(color: UIColor.yellow), for: .selected)
             flashlightButton.setTitle("", for: .normal)
             flashlightButton.setTitleColor(flashlightButton.tintColor, for: .normal)
             flashlightButton.addTarget(self, action: #selector(flashlightAction), for: .touchUpInside)
