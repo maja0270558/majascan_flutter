@@ -8,9 +8,11 @@ class MajaScan {
   static const MethodChannel _channel = const MethodChannel('majascan');
   static const CameraAccessDenied = 'PERMISSION_NOT_GRANTED';
 
-
   static Future<String> startScan(
-      {String title = "", bool flashlightEnable = true, Color barColor, Color titleColor}) async {
+      {String title = "",
+      bool flashlightEnable = true,
+      Color barColor,
+      Color titleColor}) async {
     int flashlight = (flashlightEnable ? 1 : 0);
 
     Map<String, String> scanArgs = {
