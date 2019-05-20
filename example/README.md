@@ -37,13 +37,18 @@ For Android, you must do the following before you can use the plugin:
       `<activity android:name="com.djgeo.majascan.g_scanner.QrCodeScannerActivity"/>`  
 ## Example  
  ```dart  
-String qrResult = await MajaScan.startScan(	title: “QRcode scanner”, 
-											barColor: Colors.red, 
-											titleColor: Colors.green, 
-											flashlightEnable: true);
+String qrResult = await MajaScan.startScan(
+    title: “QRcode scanner”, 
+	barColor: Colors.red, 
+	titleColor: Colors.green, 
+	flashlightEnable: true
+    );
 ```
  ### Parameters
  **title** : Navigation bar title.
+
  **barColor** : Navigation bar color.
+
  **titleColor** : Navigation bar title color (include back icon).
+
  **flashlightEnable** : flashlight button enable flag.
