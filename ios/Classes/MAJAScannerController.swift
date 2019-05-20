@@ -157,6 +157,8 @@ class MAJAScannerController: UIViewController {
         }
     }
     
+    
+    
     func settingArgumentValue() {
         if let tintColorHex: String = MAJAScanArguKey.titleColor.getKeyValue(dictionary: argumentDictionary)  {
             tintColor = UIColor(hexString: tintColorHex) ?? UIColor.white
