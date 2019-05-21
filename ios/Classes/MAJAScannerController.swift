@@ -38,6 +38,8 @@ class MAJAScannerController: UIViewController {
     var barColor: UIColor = UIColor.clear
     var barTitle: String = "掃描 QRcode"
     var flashLightEnable: Bool = true
+    var backImage: UIImage?
+    var flashlightImage: UIImage?
     
     @IBOutlet weak var previewView: UIView!
     
@@ -190,7 +192,6 @@ class MAJAScannerController: UIViewController {
             self.navigationController?.navigationBar.isTranslucent = true
         }
         
-        let backImage = UIImage(named: "back")
         
         backButton.setImage(backImage?.maskWithColor(color: tintColor), for: .normal)
         backButton.setTitle("", for: .normal)
@@ -201,9 +202,8 @@ class MAJAScannerController: UIViewController {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         
         if flashLightEnable {
-            let flashlightImage = UIImage(named: "flashlight")!
-            flashlightButton.setImage(flashlightImage.maskWithColor(color: tintColor), for: .normal)
-            flashlightButton.setImage(flashlightImage.maskWithColor(color: UIColor.yellow), for: .selected)
+            flashlightButton.setImage(flashlightImage?.maskWithColor(color: tintColor), for: .normal)
+            flashlightButton.setImage(flashlightImage?.maskWithColor(color: UIColor.yellow), for: .selected)
             flashlightButton.setTitle("", for: .normal)
             flashlightButton.setTitleColor(flashlightButton.tintColor, for: .normal)
             flashlightButton.addTarget(self, action: #selector(flashlightAction), for: .touchUpInside)

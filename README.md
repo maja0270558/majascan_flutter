@@ -4,7 +4,7 @@
 A QR code scanner flutter plugin project.  
 Using method channel open native camera page scan qr code.  
 <p align="center">  
-  <img src="/screenshot_ios.gif">  
+  <img src="https://media.giphy.com/media/XB4I4hCGGASWQGCHeu/giphy.gif">  
 </p>  
 ## Installation  
   
@@ -12,7 +12,7 @@ Using method channel open native camera page scan qr code.
 Add this to your package's pubspec.yaml file:  
 ```  
 dependencies:  
-  majascan: ^0.1.0  
+  majascan: ^0.1.4  
 ```  
 ### 2. Install it  
 You can install packages from the command line:  
