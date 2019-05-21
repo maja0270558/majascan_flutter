@@ -21,7 +21,10 @@ class HomePageState extends State<HomePage> {
 
   Future _scanQR() async {
     try {
-      String qrResult = await MajaScan.startScan(title: "QRcode scanner");
+      String qrResult = await MajaScan.startScan(
+        title: "QQRcode scanner",
+        titleColor: Color.fromARGB(255, 255, 136, 0),//Colors.amberAccent[300]
+      );
       setState(() {
         result = qrResult;
       });
