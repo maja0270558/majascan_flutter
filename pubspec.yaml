@@ -1,7 +1,8 @@
 name: majascan
 description: A qr code scanner flutter plugin project. Using method channel open native camera page scan QR code. Support iOS, Android.
-version: 0.1.3
-author: django <maja0270558@gmail.com>
+version: 0.1.4
+author: django <maja0270558@gmail.com> xyz <iori0094@gmail.com>
+
 homepage: https://maja0270558.github.io/majascan_flutter/.
 
 environment:
@@ -27,6 +28,9 @@ flutter:
   plugin:
     androidPackage: com.djgeo.majascan
     pluginClass: MajascanPlugin
+  
+  assets:
+    - assets/
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
