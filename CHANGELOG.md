@@ -1,24 +1,23 @@
+## 0.1.5
+
+* support AndroidX
 
 ## 0.1.4
 
-* TODO: Fix iOS loading assets from package problem.
+* Fix iOS loading assets from package problem.
 
 ## 0.1.3
 
-* TODO: Solved android dependency conflict.
-
-## 0.1.2
-
-* TODO: Add assets.
+*  Solved android dependency conflict.
 
 ## 0.1.1
 
-* TODO: Format main.dart
+*  Format main.dart
 
 ## 0.1.0
 
-* TODO: Add parameters for scan method to customize navigation bar style.
+*  Add parameters for scan method to customize navigation bar style.
 
 ## 0.0.1
 
-* TODO: Describe initial release.
+*  Describe initial release.

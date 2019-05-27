@@ -3,9 +3,9 @@ package com.djgeo.majascan.g_scanner;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.v4.content.PermissionChecker;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.core.content.PermissionChecker;
 import android.util.Log;
 
 
