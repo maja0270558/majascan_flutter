@@ -1,3 +1,8 @@
+## 0.1.6
+
+* change Android request permission logic
+* convert to Kotlin
+
 ## 0.1.5
 
 * support AndroidX
