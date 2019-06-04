@@ -1,3 +1,7 @@
+## 0.1.8
+
+* Fix cancel callback.
+
 ## 0.1.7
 
 * Fix iOS camera request auth crash problem.
