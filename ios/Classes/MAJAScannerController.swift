@@ -2,6 +2,12 @@
 import UIKit
 import AVFoundation
 
+enum MAJAScanError: Error {
+    case authorizationDenied(message: String)
+    case deviceNotFount(message: String)
+}
+
+
 enum MAJAScanArguKey: String {
     case title = "TITLE"
     case barColor = "BAR_COLOR"
@@ -50,13 +56,9 @@ class MAJAScannerController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         settingArgumentValue()
-        captureSessionInit()
     }
     
-    override  func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        configureNavigationBar()
-        
+    func previewLayerInit(){
         if (captureSession?.isRunning == false) {
             captureSession.startRunning()
         }
@@ -70,14 +72,51 @@ class MAJAScannerController: UIViewController {
             crosshairView = CrosshairView(frame: UIScreen.main.bounds)
             previewView.addSubview(crosshairView!)
             crosshairView.autoLayout.fillSuperview()
-            guard let output = metadataOutput else {
-                failed()
-                return
-            }
+//            guard let output = metadataOutput else {
+//                failed()
+//                return
+//            }
             /// Rect limit
             //            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: crosshairView.squareRect)
             //            output.rectOfInterest = rectOfInterest
         }
+    }
+    
+    func checkCameraAuth(success: @escaping ()->Void, fail: @escaping () -> Void){
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized: // The user has previously granted access to the camera.
+            captureSessionInit()
+            success()
+        case .notDetermined: // The user has not yet been asked for camera access.
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                if granted {
+                    self.captureSessionInit()
+                    success()
+                } else {
+                    fail()
+                }
+            }
+            
+        case .denied: // The user has previously denied access.
+            fail()
+            return
+            
+        case .restricted: // The user can't grant access due to restrictions.
+            fail()
+            return
+        }
+    }
+    
+    override  func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureNavigationBar()
+        checkCameraAuth(success: {
+            self.previewLayerInit()
+        }) {
+            self.failed(error: MAJAScanError.authorizationDenied(message: "請開啟相機權限才能使用掃瞄QR-code"))
+        }
+
+        
     }
     
     override  func viewWillDisappear(_ animated: Bool) {
@@ -224,13 +263,13 @@ class MAJAScannerController: UIViewController {
         do {
             videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
         } catch {
-            failed()
+            failed(error: MAJAScanError.deviceNotFount(message: "目前裝置不支援 QR code 掃描, 請使用有攝影機的裝置"))
             return
         }
         if (captureSession.canAddInput(videoInput)) {
             captureSession.addInput(videoInput)
         } else {
-            failed()
+            failed(error: MAJAScanError.deviceNotFount(message: "目前裝置不支援 QR code 掃描, 請使用有攝影機的裝置"))
             return
         }
         metadataOutput = AVCaptureMetadataOutput()
@@ -239,21 +278,42 @@ class MAJAScannerController: UIViewController {
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             metadataOutput.metadataObjectTypes = [.qr]
         } else {
-            failed()
+            failed(error: MAJAScanError.deviceNotFount(message: "目前裝置不支援 QR code 掃描, 請使用有攝影機的裝置"))
             return
         }
         captureSession.startRunning()
     }
     
     
-    func failed() {
-        let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
+    func failed(error: MAJAScanError) {
+//
+        //Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.
+        switch error {
+        case .authorizationDenied(let message):
+            let alertController = UIAlertController(title: "掃瞄QR碼", message: "\(message)", preferredStyle: .alert)
+            let confirmAction = UIAlertAction(title: "前往設定", style: .default) { (action) in
+                UIApplication.shared.openURL(URL(string: UIApplicationOpenSettingsURLString)!)
+                self.dismiss(animated: true, completion: nil)
+            }
+            let cancelAction = UIAlertAction(title: "取消", style: .default) { (action) in
+                self.delegate?.didFailWithErrorCode(code: "")
+                self.dismiss(animated: true, completion: nil)
+            }
+            alertController.addAction(confirmAction)
+            alertController.addAction(cancelAction)
+            present(alertController, animated: true)
+            
+        case .deviceNotFount(let message):
+            let alertController = UIAlertController(title: "掃瞄QR碼", message: "\(message)", preferredStyle: .alert)
+            let confirmAction = UIAlertAction(title: "確定", style: .default) { (action) in
+                self.delegate?.didFailWithErrorCode(code: "")
+                self.dismiss(animated: true, completion: nil)
+            }
+            alertController.addAction(confirmAction)
+            present(alertController, animated: true)
+
+        }
         captureSession = nil
-        delegate?.didFailWithErrorCode(code: "Your device does not support scanning a code from an item. Please use a device with a camera.")
-        self.dismiss(animated: true, completion: nil)
-        
     }
     
     func success() {

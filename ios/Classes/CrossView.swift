@@ -46,6 +46,19 @@ class CrosshairView: UIView {
         self.addSubview(backgroundView)
         self.addSubview(scanView)
         backgroundView.autoLayout.fillSuperview()
+        NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
+
+    }
+    
+    @objc func appEnterForeground() {
+        self.scanView.transform = .identity
+        self.scanView.layer.removeAllAnimations()
+        updateScanView()
+    }
+    
+    @objc func appEnterBackground() {
+      
     }
     
     required init?(coder aDecoder: NSCoder) {

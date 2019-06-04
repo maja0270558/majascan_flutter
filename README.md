@@ -6,13 +6,14 @@ Using method channel open native camera page scan qr code.
 <p align="center">  
   <img src="https://media.giphy.com/media/XB4I4hCGGASWQGCHeu/giphy.gif">  
 </p>  
+
 ## Installation  
   
 ### 1. Depend on it  
 Add this to your package's pubspec.yaml file:  
 ```  
 dependencies:  
-  majascan: ^0.1.6
+  majascan: ^0.1.7
 ```  
 ### 2. Install it  
 You can install packages from the command line:  
