@@ -1,3 +1,8 @@
+## 0.1.7
+
+* Fix iOS camera request auth crash problem.
+* Fix scanner animation stop when app enter background.
+
 ## 0.1.6
 
 * change Android request permission logic
