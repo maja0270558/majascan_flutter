@@ -296,7 +296,6 @@ class MAJAScannerController: UIViewController {
                 self.dismiss(animated: true, completion: nil)
             }
             let cancelAction = UIAlertAction(title: "取消", style: .default) { (action) in
-                self.delegate?.didFailWithErrorCode(code: "")
                 self.dismiss(animated: true, completion: nil)
             }
             alertController.addAction(confirmAction)
@@ -306,7 +305,6 @@ class MAJAScannerController: UIViewController {
         case .deviceNotFount(let message):
             let alertController = UIAlertController(title: "掃瞄QR碼", message: "\(message)", preferredStyle: .alert)
             let confirmAction = UIAlertAction(title: "確定", style: .default) { (action) in
-                self.delegate?.didFailWithErrorCode(code: "")
                 self.dismiss(animated: true, completion: nil)
             }
             alertController.addAction(confirmAction)
