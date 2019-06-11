@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/services.dart';
+
 import 'package:flutter/widgets.dart';
 
 class MajaScan {
@@ -13,6 +13,8 @@ class MajaScan {
       bool flashlightEnable = true,
       Color barColor,
       Color titleColor}) async {
+    
+
     int flashlight = (flashlightEnable ? 1 : 0);
 
     Map<String, String> scanArgs = {
