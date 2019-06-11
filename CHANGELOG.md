@@ -1,3 +1,7 @@
+## 0.1.9
+
+* Fix iOS orientation faceUp, faceDown preview layer don't update problem.
+
 ## 0.1.8
 
 * Fix cancel callback.

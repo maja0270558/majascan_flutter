@@ -72,10 +72,10 @@ class MAJAScannerController: UIViewController {
             crosshairView = CrosshairView(frame: UIScreen.main.bounds)
             previewView.addSubview(crosshairView!)
             crosshairView.autoLayout.fillSuperview()
-//            guard let output = metadataOutput else {
-//                failed()
-//                return
-//            }
+            //            guard let output = metadataOutput else {
+            //                failed()
+            //                return
+            //            }
             /// Rect limit
             //            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: crosshairView.squareRect)
             //            output.rectOfInterest = rectOfInterest
@@ -110,12 +110,13 @@ class MAJAScannerController: UIViewController {
     override  func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
+        updatePreviewLayerOrientation()
         checkCameraAuth(success: {
             self.previewLayerInit()
         }) {
             self.failed(error: MAJAScanError.authorizationDenied(message: "請開啟相機權限才能使用掃瞄QR-code"))
         }
-
+        
         
     }
     
@@ -128,26 +129,7 @@ class MAJAScannerController: UIViewController {
     
     override  func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        if let connection =  self.previewLayer?.connection  {
-            let currentDevice: UIDevice = UIDevice.current
-            let orientation: UIDeviceOrientation = currentDevice.orientation
-            let previewLayerConnection : AVCaptureConnection = connection
-            if previewLayerConnection.isVideoOrientationSupported {
-                switch (orientation) {
-                case .portrait: updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-                    break
-                case .landscapeRight: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
-                    break
-                case .landscapeLeft: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
-                    break
-                case .portraitUpsideDown: updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
-                    break
-                default: updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-                    break
-                }
-            }
-        }
+        updatePreviewLayerOrientation()
     }
     
     /*
@@ -160,6 +142,44 @@ class MAJAScannerController: UIViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
+    private func updatePreviewLayerOrientation(){
+        if let connection =  self.previewLayer?.connection  {
+            let currentDevice: UIDevice = UIDevice.current
+            let orientation: UIDeviceOrientation = currentDevice.orientation
+            let previewLayerConnection : AVCaptureConnection = connection
+            
+            if previewLayerConnection.isVideoOrientationSupported {
+                switch (orientation) {
+                case .portrait: updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+                    break
+                case .landscapeRight: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
+                    break
+                case .landscapeLeft: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
+                    break
+                case .portraitUpsideDown: updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
+                    break
+                default:
+                    let statusBarOrientation = UIApplication.shared.statusBarOrientation
+                    switch statusBarOrientation {
+                    case .landscapeLeft:
+                        updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
+                    case .landscapeRight:
+                        updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
+                    case .portrait:
+                        updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+                    case .portraitUpsideDown:
+                        updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
+                    case .unknown:
+                        updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
+                    }
+                    break
+                }
+            }
+        }
+    }
+    
     
     private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
         
@@ -286,8 +306,7 @@ class MAJAScannerController: UIViewController {
     
     
     func failed(error: MAJAScanError) {
-//
-        //Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.
+        
         switch error {
         case .authorizationDenied(let message):
             let alertController = UIAlertController(title: "掃瞄QR碼", message: "\(message)", preferredStyle: .alert)
@@ -309,7 +328,7 @@ class MAJAScannerController: UIViewController {
             }
             alertController.addAction(confirmAction)
             present(alertController, animated: true)
-
+            
         }
         captureSession = nil
     }
@@ -326,9 +345,6 @@ class MAJAScannerController: UIViewController {
         ac.addAction(cancelAction)
         ac.addAction(confirmAction)
         present(ac, animated: true)
-    }
-    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
     }
 }
 
