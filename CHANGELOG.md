@@ -1,3 +1,7 @@
+## 0.2.0
+
+* Move iOS UI code to main thread.
+
 ## 0.1.9
 
 * Fix iOS orientation faceUp, faceDown preview layer don't update problem.
