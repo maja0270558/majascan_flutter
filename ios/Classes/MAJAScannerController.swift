@@ -64,21 +64,24 @@ class MAJAScannerController: UIViewController {
         }
         if previewLayer == nil {
             /// add preview layer
-            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-            previewLayer.frame = self.previewView.bounds
-            previewLayer.videoGravity = .resizeAspectFill
-            previewView.layer.addSublayer(previewLayer)
-            /// overlay rect
-            crosshairView = CrosshairView(frame: UIScreen.main.bounds)
-            previewView.addSubview(crosshairView!)
-            crosshairView.autoLayout.fillSuperview()
-            //            guard let output = metadataOutput else {
-            //                failed()
-            //                return
-            //            }
-            /// Rect limit
-            //            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: crosshairView.squareRect)
-            //            output.rectOfInterest = rectOfInterest
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+                self.previewLayer.frame = self.previewView.bounds
+                self.previewLayer.videoGravity = .resizeAspectFill
+                self.previewView.layer.addSublayer(self.previewLayer)
+                /// overlay rect
+                self.crosshairView = CrosshairView(frame: UIScreen.main.bounds)
+                self.previewView.addSubview(self.crosshairView!)
+                self.crosshairView.autoLayout.fillSuperview()
+                //            guard let output = metadataOutput else {
+                //                failed()
+                //                return
+                //            }
+                /// Rect limit
+                //            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: crosshairView.squareRect)
+                //            output.rectOfInterest = rectOfInterest
+            }
         }
     }
     
