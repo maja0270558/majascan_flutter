@@ -27,6 +27,7 @@ class QrCodeScannerActivity : AppCompatActivity() {
         val TITLE = "TITLE"
         val TITLE_COLOR = "TITLE_COLOR"
         val BAR_COLOR = "BAR_COLOR"
+        val QR_CORNER_COLOR = "QR_CORNER_COLOR"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,37 +63,29 @@ class QrCodeScannerActivity : AppCompatActivity() {
             hasFlashLight = false
         }
 
-        //toolbar顏色
-        var toolbarColor = 0
-        val stringBarColor = intent.getStringExtra(BAR_COLOR)
-        if (!TextUtils.isEmpty(stringBarColor) && stringBarColor.indexOf("#") == 0) {
-            try {
-                toolbarColor = Color.parseColor(stringBarColor)
-            } catch (e: Exception) {
-                Log.e("QrCodeScannerActivity", "parse color code error:$e")
-            }
-
-        }
-
-        var titleColor = 0
-        val stringTitleColor = intent.getStringExtra(TITLE_COLOR)
-        if (!TextUtils.isEmpty(stringTitleColor) && stringTitleColor.indexOf("#") == 0) {
-            try {
-                titleColor = Color.parseColor(stringTitleColor)
-            } catch (e: Exception) {
-                Log.e("QrCodeScannerActivity", "parse color code error:$e")
-            }
-
-        }
-
         val scanFragment = ScanFragment.newInstance(
-                intent.getStringExtra(TITLE),
-                hasFlashLight,
-                toolbarColor,
-                titleColor
+                title = intent.getStringExtra(TITLE),
+                hasFlashLight = hasFlashLight,
+                toolBarColor = findColorByBundle(BAR_COLOR),
+                titleColor = findColorByBundle(TITLE_COLOR),
+                qrCornerColor = findColorByBundle(QR_CORNER_COLOR)
         )
 
         fm?.beginTransaction()?.replace(R.id.fragment_container, scanFragment, ScanFragment::class.java.simpleName)?.commitAllowingStateLoss()
+    }
+
+    private fun findColorByBundle(bundleKey: String): Int {
+        var color = 0
+        val stringTitleColor = intent.getStringExtra(bundleKey)
+        if (!TextUtils.isEmpty(stringTitleColor) && stringTitleColor.indexOf("#") == 0) {
+            try {
+                color = Color.parseColor(stringTitleColor)
+            } catch (e: Exception) {
+                Log.e("QrCodeScannerActivity", "parse $bundleKey color code error:$e")
+            }
+        }
+        return color
+
     }
 
     fun receiveAndSetResult(result: String) {
