@@ -1,3 +1,8 @@
+
+## 0.3.0
+
+* Add Scanner line, square color parameter option.
+
 ## 0.2.0
 
 * Move iOS UI code to main thread.
