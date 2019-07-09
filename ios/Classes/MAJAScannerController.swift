@@ -13,7 +13,8 @@ enum MAJAScanArguKey: String {
     case barColor = "BAR_COLOR"
     case titleColor = "TITLE_COLOR"
     case flashLightEnable = "FLASHLIGHT"
-    
+    case squareColor = "QR_CORNER_COLOR"
+
     func getKeyValue<T>(dictionary: NSDictionary) -> T? {
         guard let result =  dictionary[self.rawValue] as? T else {
             return nil
@@ -42,6 +43,7 @@ class MAJAScannerController: UIViewController {
     let navButtonFrame = CGRect(x: 0, y: 0, width: 20 , height: 20)
     var tintColor: UIColor = UIColor.white
     var barColor: UIColor = UIColor.clear
+    var squareColor: UIColor = UIColor.orange
     var barTitle: String = "掃描 QRcode"
     var flashLightEnable: Bool = true
     var backImage: UIImage?
@@ -71,7 +73,7 @@ class MAJAScannerController: UIViewController {
                 self.previewLayer.videoGravity = .resizeAspectFill
                 self.previewView.layer.addSublayer(self.previewLayer)
                 /// overlay rect
-                self.crosshairView = CrosshairView(frame: UIScreen.main.bounds)
+                self.crosshairView = CrosshairView(frame: UIScreen.main.bounds, color: self.squareColor)
                 self.previewView.addSubview(self.crosshairView!)
                 self.crosshairView.autoLayout.fillSuperview()
                 //            guard let output = metadataOutput else {
@@ -230,8 +232,11 @@ class MAJAScannerController: UIViewController {
         }
         
         if let barColorHex: String = MAJAScanArguKey.barColor.getKeyValue(dictionary: argumentDictionary)  {
-            print(barColorHex)
             barColor = UIColor(hexString: barColorHex) ?? UIColor.clear
+        }
+        
+        if let squareColorHex: String = MAJAScanArguKey.squareColor.getKeyValue(dictionary: argumentDictionary)  {
+            squareColor = UIColor(hexString: squareColorHex) ?? UIColor.orange
         }
         
         if let newBarTitle: String = MAJAScanArguKey.title.getKeyValue(dictionary: argumentDictionary)  {
