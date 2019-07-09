@@ -40,10 +40,12 @@ class CrosshairView: UIView {
     var scanView = UIView(frame: CGRect.zero)
     var scanGradientLayer = CAGradientLayer()
     var color: UIColor!
-    
-    convenience init(frame: CGRect,color: UIColor = UIColor.orange)  {
+    var scannerColor: UIColor!
+
+    convenience init(frame: CGRect,color: UIColor = UIColor.orange, scannerColor:UIColor = UIColor.orange)  {
         self.init(frame: frame)
         self.color = color
+        self.scannerColor = scannerColor
     }
     
     override init(frame: CGRect) {
@@ -111,7 +113,7 @@ class CrosshairView: UIView {
         scanGradientLayer.startPoint = CGPoint.zero
         scanGradientLayer.endPoint = CGPoint(x: 1, y: 0)
         scanGradientLayer.frame = scanView.bounds
-        scanGradientLayer.colors = [color.cgColor, UIColor.white.cgColor,color.cgColor]
+        scanGradientLayer.colors = [scannerColor.cgColor, UIColor.white.cgColor,scannerColor.cgColor]
         scanView.layer.addSublayer(scanGradientLayer)
     }
     
