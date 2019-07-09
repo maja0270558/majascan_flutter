@@ -4,6 +4,7 @@ package com.djgeo.majascan.g_scanner
 import android.Manifest.permission.CAMERA
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -23,6 +24,8 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.djgeo.majascan.R
 import com.djgeo.majascan.g_scanner.QrCodeScannerActivity.Companion.REQUEST_CAMERA
+import android.graphics.drawable.GradientDrawable
+
 
 class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
 
@@ -34,13 +37,16 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
     private var mTvTitle: TextView? = null
     private var mToolbar: Toolbar? = null
     private var mBackBtn: ImageView? = null
+    private var mQrView: QrBorderView? = null
+    private var mScanBar: View? = null
 
     private var scanInteractor: ScanInteractor? = null
     private var mGoToWebviewDialog: AlertDialog? = null
 
     companion object {
 
-        fun newInstance(title: String, hasFlashLight: Boolean, toolBarColor: Int, titleColor: Int): ScanFragment {
+        fun newInstance(title: String, hasFlashLight: Boolean, toolBarColor: Int, titleColor: Int,
+                        qrCornerColor: Int = 0, qrScanColor: Int = 0): ScanFragment {
 
             val args = Bundle()
             args.putString(QrCodeScannerActivity.TITLE, title)
@@ -54,6 +60,13 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
                 args.putInt(QrCodeScannerActivity.TITLE_COLOR, titleColor)
             }
 
+            if (qrCornerColor != 0) {
+                args.putInt(QrCodeScannerActivity.QR_CORNER_COLOR, qrCornerColor)
+            }
+
+            if (qrScanColor != 0) {
+                args.putInt(QrCodeScannerActivity.QR_SCANNER_COLOR, qrScanColor)
+            }
 
             val fragment = ScanFragment()
             fragment.arguments = args
@@ -74,6 +87,8 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
         mScannerBar = view.findViewById(R.id.scan_bar)
         mTvTitle = view.findViewById(R.id.tv_title)
         mToolbar = view.findViewById(R.id.actionbar)
+        mQrView = view.findViewById(R.id.capture_crop_view)
+        mScanBar = view.findViewById(R.id.scan_bar)
 
         //閃光燈
         mFlashlightBtn = view.findViewById(R.id.toggle_flashlight)
@@ -112,6 +127,19 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
                 mTvTitle?.setTextColor(titleColor)
             }
 
+            val qRCornerColor = args.getInt(QrCodeScannerActivity.QR_CORNER_COLOR, 0)
+            if (qRCornerColor != 0) {
+                mQrView?.setQRCornerColor(qRCornerColor)
+            }
+
+            //gradient
+            val qRScannerColor = args.getInt(QrCodeScannerActivity.QR_SCANNER_COLOR, Color.rgb(255, 136, 0))
+            val gd = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                    intArrayOf(qRScannerColor, Color.WHITE, qRScannerColor))
+//            gd.cornerRadius = 0f
+            mScanBar?.background = gd
+
+//            layout.setBackgroundDrawable(gd)
         }
     }
 
