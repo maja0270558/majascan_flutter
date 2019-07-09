@@ -28,6 +28,7 @@ class QrCodeScannerActivity : AppCompatActivity() {
         val TITLE_COLOR = "TITLE_COLOR"
         val BAR_COLOR = "BAR_COLOR"
         val QR_CORNER_COLOR = "QR_CORNER_COLOR"
+        val QR_SCANNER_COLOR = "QR_SCANNER_COLOR"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +69,8 @@ class QrCodeScannerActivity : AppCompatActivity() {
                 hasFlashLight = hasFlashLight,
                 toolBarColor = findColorByBundle(BAR_COLOR),
                 titleColor = findColorByBundle(TITLE_COLOR),
-                qrCornerColor = findColorByBundle(QR_CORNER_COLOR)
+                qrCornerColor = findColorByBundle(QR_CORNER_COLOR),
+                qrScanColor = findColorByBundle(QR_SCANNER_COLOR)
         )
 
         fm?.beginTransaction()?.replace(R.id.fragment_container, scanFragment, ScanFragment::class.java.simpleName)?.commitAllowingStateLoss()
