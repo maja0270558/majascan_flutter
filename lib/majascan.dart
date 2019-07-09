@@ -14,6 +14,7 @@ class MajaScan {
     Color barColor,
     Color titleColor,
     Color qRCornerColor,
+    Color qRScannerColor,
   }) async {
     int flashlight = (flashlightEnable ? 1 : 0);
 
@@ -30,8 +31,14 @@ class MajaScan {
       scanArgs[ScanArgs.TITLE_COLOR] = '#${titleColor.value.toRadixString(16)}';
     }
 
-    if(qRCornerColor != null){
-      scanArgs[ScanArgs.QR_CORNER_COLOR] = '#${qRCornerColor.value.toRadixString(16)}';
+    if (qRCornerColor != null) {
+      scanArgs[ScanArgs.QR_CORNER_COLOR] =
+          '#${qRCornerColor.value.toRadixString(16)}';
+    }
+
+    if (qRScannerColor != null) {
+      scanArgs[ScanArgs.QR_SCANNER_COLOR] =
+      '#${qRScannerColor.value.toRadixString(16)}';
     }
 
     final String result = await _channel.invokeMethod('scan', scanArgs);
@@ -45,4 +52,5 @@ class ScanArgs {
   static const TITLE_COLOR = "TITLE_COLOR";
   static const BAR_COLOR = "BAR_COLOR";
   static const QR_CORNER_COLOR = "QR_CORNER_COLOR";
+  static const QR_SCANNER_COLOR = "QR_SCANNER_COLOR";
 }

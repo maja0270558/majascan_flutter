@@ -24,7 +24,8 @@ class HomePageState extends State<HomePage> {
       String qrResult = await MajaScan.startScan(
           title: "QRcode scanner",
           titleColor: Colors.amberAccent[700],
-          qRCornerColor: Colors.green);
+          qRCornerColor: Colors.green,
+          qRScannerColor: Colors.deepPurple);
       setState(() {
         result = qrResult;
       });

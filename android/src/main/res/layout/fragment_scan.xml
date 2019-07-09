@@ -37,22 +37,9 @@
                     android:id="@+id/scan_bar"
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:background="@drawable/scan_bar_gradient"
                     android:visibility="gone" />
 
             </com.djgeo.majascan.g_scanner.QrBorderView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/capture_crop_view"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="15dp"
-                android:drawableLeft="@drawable/qr_code"
-                android:drawablePadding="5dp"
-                android:text="請將QR碼放入框內"
-                android:textColor="#ffffff"
-                android:visibility="gone" />
 
             <ImageView
                 android:layout_width="match_parent"
