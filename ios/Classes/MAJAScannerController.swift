@@ -311,7 +311,7 @@ class MAJAScannerController: UIViewController {
         if (captureSession.canAddOutput(metadataOutput)) {
             captureSession.addOutput(metadataOutput)
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-            metadataOutput.metadataObjectTypes = [.qr]
+            metadataOutput.metadataObjectTypes = [.aztec, .code128, .code39, .code39Mod43, .code93, .dataMatrix, .ean13, .ean8, .interleaved2of5, .itf14, .pdf417, .qr]
         } else {
             failed(error: MAJAScanError.deviceNotFount(message: "目前裝置不支援 QR code 掃描, 請使用有攝影機的裝置"))
             return

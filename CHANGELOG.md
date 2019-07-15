@@ -1,4 +1,8 @@
 
+## 0.3.1
+
+* iOS support code-128 Barcode metadata type
+
 ## 0.3.0
 
 * Add Scanner line, square color parameter option.
