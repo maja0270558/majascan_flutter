@@ -13,7 +13,7 @@ Using method channel open native camera page scan qr code.
 Add this to your package's pubspec.yaml file:  
 ```  
 dependencies:  
-  majascan: ^0.3.0
+  majascan: ^0.3.1
 ```  
 ### 2. Install it  
 You can install packages from the command line:  
@@ -21,7 +21,7 @@ with Flutter:
 ```  
 $ flutter packages get  
 ```  
-3. Import it  
+###3. Import it  
 Now in your Dart code, you can use:  
 ```  
 import 'package:majascan/majascan.dart';  
@@ -34,7 +34,7 @@ Add the the camera usage description to your Info.plist
 ```  
 ### Android  
 For Android, you must do the following before you can use the plugin:  
-    * Add the QrCodeScannerActivity to your AndroidManifest.xml  
+Add the QrCodeScannerActivity to your AndroidManifest.xml  
       `<activity android:name="com.djgeo.majascan.g_scanner.QrCodeScannerActivity"/>`  
 ## Example  
  ```dart  
