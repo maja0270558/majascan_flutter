@@ -30,6 +30,7 @@ class MajascanPlugin(activity: Activity) : MethodCallHandler, PluginRegistry.Act
 
     private var activity: Activity? = activity
     private var mResult: Result? = null
+    private var mResultPeriod = 0L
 
     override fun onMethodCall(call: MethodCall, result: Result) {
 
@@ -47,13 +48,18 @@ class MajascanPlugin(activity: Activity) : MethodCallHandler, PluginRegistry.Act
         }
     }
 
+    //issue tracking https://github.com/flutter/flutter/issues/29092
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        val currentTime = System.currentTimeMillis()
         if (requestCode == Request_Scan && resultCode == RESULT_OK && data != null) {
-            val resultString = data.getStringExtra(QrCodeScannerActivity.BUNDLE_SCAN_CALLBACK)
-            resultString?.let {
-                mResult?.success(it)
+            if (currentTime - mResultPeriod >= 1000) {
+                mResultPeriod = currentTime
+                val resultString = data.getStringExtra(QrCodeScannerActivity.BUNDLE_SCAN_CALLBACK)
+                resultString?.let {
+                    mResult?.success(it)
+                }
+                return true
             }
-            return true
         }
         return false
     }
