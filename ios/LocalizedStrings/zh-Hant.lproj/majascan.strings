@@ -11,7 +11,7 @@
 
 "confirm" = "確認";
 
-"cameraPermisionNonOpen" = "請開啟相機權限才能使用掃瞄QR-code";
+"cameraPermisionNonOpen" = "看起來你的權限設定正防止我們取用相機，您可以依照以下步驟打開權限。\n\n1. 按下方前往按鈕到設定畫面 \n\n2.打開相機權限 \n\n3. 打開此ＡＰＰ在試一次";
 
 "scannerTitle" = "掃瞄QR碼";
 

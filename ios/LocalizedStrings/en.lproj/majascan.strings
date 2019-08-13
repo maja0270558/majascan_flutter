@@ -1,22 +1,8 @@
-/* 
-  en.strings
-  Pods
-
-  Created by 1293 on 2019/8/13.
-  
-*/
-
 "cancel" = "Cancel";
-
 "confirm" = "Confirm";
-
 "cameraPermisionNonOpen" = "It looks like your privacy settings are preventing us from accessing your camera to do barcode scanning. You can fix this by doing the following:\n\n1. Touch the Go button below to open the Settings app.\n\n2. Turn the Camera on.\n\n3. Open this app and try again.";
-
 "scannerTitle" = "Scan QRCode";
-
 "goImmediately" = "Do you want to go immediately?";
-
 "go" = "GO";
-
 "deviceNotSupport" = "Current device is not supported";
 

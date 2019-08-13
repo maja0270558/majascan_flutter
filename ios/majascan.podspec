@@ -19,7 +19,7 @@ A new flutter plugin project.
   s.ios.deployment_target = '8.0'
   
   s.resource_bundles = {
-      'local' => ['majascan/LocalizedStrings/*.lproj/*.string']
+      'majascanLocalizeBundle' => ['LocalizedStrings/*.lproj']
   }
 end
 

@@ -19,13 +19,9 @@ protocol LocalizableDelegate {
 
 extension LocalizableDelegate {
     var localized: String {
-        let path = Bundle(for: Localize.self).resourcePath! + "/local.bundle"
-        let CABundle = Bundle(path: path)!
-
-        
-        print(path)
-
-        return NSLocalizedString(rawValue, bundle: CABundle, comment: "")
+        let path = Bundle(for: Localize.self).path(forResource: "majascanLocalizeBundle", ofType: "bundle")!
+        let bundle = Bundle(path: path) ?? Bundle.main
+        return  NSLocalizedString(rawValue, tableName: "majascan", bundle: bundle, value: "", comment: "")
     }
     var table: String? {
         return nil
