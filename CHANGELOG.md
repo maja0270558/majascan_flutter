@@ -1,3 +1,6 @@
+## 0.3.2
+
+* Add localization both iOS and android. 
 
 ## 0.3.1
 
