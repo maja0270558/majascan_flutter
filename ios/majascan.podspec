@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'majascan'
-  s.version          = '0.0.1'
+  s.version          = '0.0.2'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -17,5 +17,9 @@ A new flutter plugin project.
   s.dependency 'Flutter'
 
   s.ios.deployment_target = '8.0'
+  
+  s.resource_bundles = {
+      'local' => ['majascan/LocalizedStrings/*.lproj/*.string']
+  }
 end
 

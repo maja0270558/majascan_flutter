@@ -47,7 +47,7 @@ class MAJAScannerController: UIViewController {
     var squareColor: UIColor = UIColor.orange
     var scannerColor: UIColor = UIColor.orange
 
-    var barTitle: String = "掃描 QRcode"
+    var barTitle: String = Localizable.ScanPage.scannerTitle.localized  // "掃描 QRcode"
     var flashLightEnable: Bool = true
     var backImage: UIImage?
     var flashlightImage: UIImage?
@@ -122,7 +122,7 @@ class MAJAScannerController: UIViewController {
         checkCameraAuth(success: {
             self.previewLayerInit()
         }) {
-            self.failed(error: MAJAScanError.authorizationDenied(message: "請開啟相機權限才能使用掃瞄QR-code"))
+            self.failed(error: MAJAScanError.authorizationDenied(message: Localizable.ScanPage.cameraPermisionNonOpen.localized))
         }
         
         
@@ -298,13 +298,13 @@ class MAJAScannerController: UIViewController {
         do {
             videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
         } catch {
-            failed(error: MAJAScanError.deviceNotFount(message: "目前裝置不支援 QR code 掃描, 請使用有攝影機的裝置"))
+            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
             return
         }
         if (captureSession.canAddInput(videoInput)) {
             captureSession.addInput(videoInput)
         } else {
-            failed(error: MAJAScanError.deviceNotFount(message: "目前裝置不支援 QR code 掃描, 請使用有攝影機的裝置"))
+            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
             return
         }
         metadataOutput = AVCaptureMetadataOutput()
@@ -313,7 +313,7 @@ class MAJAScannerController: UIViewController {
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             metadataOutput.metadataObjectTypes = [.aztec, .code128, .code39, .code39Mod43, .code93, .dataMatrix, .ean13, .ean8, .interleaved2of5, .itf14, .pdf417, .qr]
         } else {
-            failed(error: MAJAScanError.deviceNotFount(message: "目前裝置不支援 QR code 掃描, 請使用有攝影機的裝置"))
+            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
             return
         }
         captureSession.startRunning()
@@ -324,12 +324,12 @@ class MAJAScannerController: UIViewController {
         
         switch error {
         case .authorizationDenied(let message):
-            let alertController = UIAlertController(title: "掃瞄QR碼", message: "\(message)", preferredStyle: .alert)
-            let confirmAction = UIAlertAction(title: "前往設定", style: .default) { (action) in
+            let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(message)", preferredStyle: .alert)
+            let confirmAction = UIAlertAction(title: Localizable.Global.go.localized, style: .default) { (action) in
                 UIApplication.shared.openURL(URL(string: UIApplicationOpenSettingsURLString)!)
                 self.dismiss(animated: true, completion: nil)
             }
-            let cancelAction = UIAlertAction(title: "取消", style: .default) { (action) in
+            let cancelAction = UIAlertAction(title: Localizable.Global.cancel.localized, style: .default) { (action) in
                 self.dismiss(animated: true, completion: nil)
             }
             alertController.addAction(confirmAction)
@@ -337,8 +337,8 @@ class MAJAScannerController: UIViewController {
             present(alertController, animated: true)
             
         case .deviceNotFount(let message):
-            let alertController = UIAlertController(title: "掃瞄QR碼", message: "\(message)", preferredStyle: .alert)
-            let confirmAction = UIAlertAction(title: "確定", style: .default) { (action) in
+            let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(message)", preferredStyle: .alert)
+            let confirmAction = UIAlertAction(title: Localizable.Global.confirm.localized, style: .default) { (action) in
                 self.dismiss(animated: true, completion: nil)
             }
             alertController.addAction(confirmAction)
@@ -349,11 +349,11 @@ class MAJAScannerController: UIViewController {
     }
     
     func success() {
-        let ac = UIAlertController(title: "", message: "是否立即前往", preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "取消", style: .default) { (action) in
+        let ac = UIAlertController(title: "", message: Localizable.ScanPage.goImmediately.localized, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: Localizable.Global.cancel.localized, style: .default) { (action) in
             self.captureSession.startRunning()
         }
-        let confirmAction = UIAlertAction(title: "前往", style: .default) { (action) in
+        let confirmAction = UIAlertAction(title: Localizable.Global.go.localized, style: .default) { (action) in
             self.captureSession.startRunning()
             self.dismiss(animated: true, completion: nil)
         }

@@ -1,0 +1,23 @@
+/* 
+  zh-Hant.strings
+  Pods
+
+  Created by 1293 on 2019/8/13.
+  
+*/
+
+
+"cancel" = "取消";
+
+"confirm" = "確認";
+
+"cameraPermisionNonOpen" = "請開啟相機權限才能使用掃瞄QR-code";
+
+"scannerTitle" = "掃瞄QR碼";
+
+"goImmediately" = "是否立即前往?";
+
+"go" = "前往";
+
+"deviceNotSupport" = "目前裝置不支援 QR code 掃描";
+
