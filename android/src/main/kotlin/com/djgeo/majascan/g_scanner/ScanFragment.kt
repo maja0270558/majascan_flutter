@@ -25,11 +25,12 @@ import androidx.fragment.app.Fragment
 import com.djgeo.majascan.R
 import com.djgeo.majascan.g_scanner.QrCodeScannerActivity.Companion.REQUEST_CAMERA
 import android.graphics.drawable.GradientDrawable
+import androidx.core.content.ContextCompat
 
 
 class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
 
-    private val mWebTitle: String? = null//如果title不為空 => 顯示webView
+    private val mWebTitle: String? = null
 
     private var mCapturePreview: FrameLayout? = null
     private var mScannerBar: View? = null
@@ -109,7 +110,7 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
 
     private fun handleBundleData() {
         val args = arguments
-        if (args != null) {
+        if (args != null && context != null) {
             val title = args.getString(QrCodeScannerActivity.TITLE, getString(R.string.scanner_title))
             mTvTitle?.text = title
 
@@ -120,10 +121,11 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
 
             val titleColor = args.getInt(QrCodeScannerActivity.TITLE_COLOR, 0)
             if (titleColor != 0) {
-                val drawable = resources.getDrawable(R.drawable.left_arrow)
-                drawable.colorFilter = PorterDuffColorFilter(titleColor, PorterDuff.Mode.MULTIPLY)
-                mBackBtn?.setImageDrawable(drawable)
-
+                val drawable = ContextCompat.getDrawable(context!!, R.drawable.left_arrow)
+                drawable?.let {
+                    it.colorFilter = PorterDuffColorFilter(titleColor, PorterDuff.Mode.MULTIPLY)
+                    mBackBtn?.setImageDrawable(it)
+                }
                 mTvTitle?.setTextColor(titleColor)
             }
 
@@ -136,10 +138,7 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
             val qRScannerColor = args.getInt(QrCodeScannerActivity.QR_SCANNER_COLOR, Color.rgb(255, 136, 0))
             val gd = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
                     intArrayOf(qRScannerColor, Color.WHITE, qRScannerColor))
-//            gd.cornerRadius = 0f
             mScanBar?.background = gd
-
-//            layout.setBackgroundDrawable(gd)
         }
     }
 
@@ -156,6 +155,8 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
                 val cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (cameraAccepted) {
                     startScan()
+                } else {
+                    activity?.finish()
                 }
             }
         }
@@ -165,8 +166,9 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
         activity?.let {
             AlertDialog.Builder(it)
                     .setMessage(getString(R.string.camera_permission_tips))
-                    .setPositiveButton(getString(R.string.dialog_btn_go)) { _, _ -> activity?.let { PermissionUtil.goToSettingPermission(it) } }
-                    .setNegativeButton(getString(R.string.dialog_btn_cancel)) { _, _ -> activity!!.finish() }
+                    .setPositiveButton(getString(R.string.dialog_btn_go)) { _, _ -> activity?.let { PermissionUtil.goToSettingPermission(activity!!) } }
+                    .setNegativeButton(getString(R.string.dialog_btn_cancel)) { _, _ -> activity?.finish() }
+                    .setCancelable(false)
                     .create()
                     .show()
         }
