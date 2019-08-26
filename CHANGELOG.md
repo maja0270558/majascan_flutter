@@ -1,3 +1,7 @@
+## 0.3.3
+
+* Fix iOS load nib fail problem. 
+
 ## 0.3.2
 
 * Add localization both iOS and android. 
