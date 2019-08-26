@@ -1,3 +1,7 @@
+## 0.3.4
+
+* iOS to swift 5.
+
 ## 0.3.3
 
 * Fix iOS load nib fail problem. 

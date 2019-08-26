@@ -55,8 +55,8 @@ class CrosshairView: UIView {
         self.addSubview(backgroundView)
         self.addSubview(scanView)
         backgroundView.autoLayout.fillSuperview()
-        NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.willResignActiveNotification, object: nil)
 
     }
     
@@ -91,7 +91,7 @@ class CrosshairView: UIView {
         path.addRect(UIScreen.main.bounds)
         path.addRect(maskRect)
         
-        backgroundMaskLayer.fillRule = kCAFillRuleEvenOdd
+        backgroundMaskLayer.fillRule = CAShapeLayerFillRule.evenOdd
         backgroundMaskLayer.frame = self.bounds
         backgroundMaskLayer.path = path
         self.backgroundView.layer.mask = backgroundMaskLayer
