@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'majascan'
-  s.version          = '0.0.3'
+  s.version          = '0.0.4'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -15,7 +15,7 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-
+  s.swift_version = '4.2'
   s.ios.deployment_target = '8.0'
   
   s.resource_bundles = {
