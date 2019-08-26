@@ -1,3 +1,7 @@
+## 0.3.5
+
+* podspec add swift version.
+
 ## 0.3.4
 
 * iOS to swift 5.
