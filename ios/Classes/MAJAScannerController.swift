@@ -52,8 +52,6 @@ class MAJAScannerController: UIViewController {
     var backImage: UIImage?
     var flashlightImage: UIImage?
     
-    @IBOutlet weak var previewView: UIView!
-    
     /*
      Life cycle
      */
@@ -72,12 +70,12 @@ class MAJAScannerController: UIViewController {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-                self.previewLayer.frame = self.previewView.bounds
+                self.previewLayer.frame = self.view.bounds
                 self.previewLayer.videoGravity = .resizeAspectFill
-                self.previewView.layer.addSublayer(self.previewLayer)
+                self.view.layer.addSublayer(self.previewLayer)
                 /// overlay rect
                 self.crosshairView = CrosshairView(frame: UIScreen.main.bounds, color: self.squareColor, scannerColor: self.scannerColor)
-                self.previewView.addSubview(self.crosshairView!)
+                self.view.addSubview(self.crosshairView!)
                 self.crosshairView.autoLayout.fillSuperview()
                 //            guard let output = metadataOutput else {
                 //                failed()
@@ -144,7 +142,7 @@ class MAJAScannerController: UIViewController {
      Init Method
      */
     init() {
-        super.init(nibName: "MAJAScannerController", bundle: Bundle(for: MAJAScannerController.self))
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
