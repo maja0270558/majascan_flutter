@@ -14,9 +14,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/majascan/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
-  majascan: 4a2d59fda043b2b270b16cd0de540af7b45d40e3
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  majascan: aec5a04a3149f5690963b69a07e5f7775e300d32
 
 PODFILE CHECKSUM: ebd43b443038e611b86ede96e613bd6033c49497
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.8.4

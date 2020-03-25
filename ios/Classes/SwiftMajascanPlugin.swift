@@ -25,7 +25,8 @@ public class SwiftMajascanPlugin: NSObject, FlutterPlugin {
             let scanController = MAJAScannerController()
             scanController.delegate = self
             let navigationController = UINavigationController(rootViewController: scanController)
-            
+            scanController.modalPresentationStyle = .fullScreen
+            navigationController.modalPresentationStyle = .fullScreen
             if let arguDictinary = call.arguments as? NSDictionary {
                scanController.argumentDictionary = arguDictinary
             }

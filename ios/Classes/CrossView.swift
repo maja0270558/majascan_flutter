@@ -8,6 +8,12 @@ class CrosshairView: UIView {
     }
 
     var squareWidth: CGFloat {
+        if scale > 1 {
+            scale = 1
+        } else if scale < 0 {
+            scale = 0
+        }
+        
         return minDistance * CGFloat(scale)
     }
     
