@@ -14,10 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.CheckBox
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -25,7 +21,9 @@ import androidx.fragment.app.Fragment
 import com.djgeo.majascan.R
 import com.djgeo.majascan.g_scanner.QrCodeScannerActivity.Companion.REQUEST_CAMERA
 import android.graphics.drawable.GradientDrawable
+import android.widget.*
 import androidx.core.content.ContextCompat
+import kotlin.math.min
 
 
 class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
@@ -47,7 +45,7 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
     companion object {
 
         fun newInstance(title: String, hasFlashLight: Boolean, toolBarColor: Int, titleColor: Int,
-                        qrCornerColor: Int = 0, qrScanColor: Int = 0): ScanFragment {
+                        qrCornerColor: Int = 0, qrScanColor: Int = 0, scanAreaScale: Float): ScanFragment {
 
             val args = Bundle()
             args.putString(QrCodeScannerActivity.TITLE, title)
@@ -68,6 +66,8 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
             if (qrScanColor != 0) {
                 args.putInt(QrCodeScannerActivity.QR_SCANNER_COLOR, qrScanColor)
             }
+
+            args.putFloat(QrCodeScannerActivity.SCAN_AREA_SCALE, scanAreaScale)
 
             val fragment = ScanFragment()
             fragment.arguments = args
@@ -139,6 +139,16 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
             val gd = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
                     intArrayOf(qRScannerColor, Color.WHITE, qRScannerColor))
             mScanBar?.background = gd
+
+            //依據BundleData調整mQrView寬高
+            var scale = args.getFloat(QrCodeScannerActivity.SCAN_AREA_SCALE)
+            if (scale <= 0F) scale = 0F
+            if (scale >= 1F) scale = 1F
+            val length = (min(resources.displayMetrics.widthPixels,
+                    resources.displayMetrics.heightPixels) * scale).toInt()
+            val layoutParams = RelativeLayout.LayoutParams(length, length)
+            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT)
+            mQrView?.layoutParams = layoutParams
         }
     }
 

@@ -29,6 +29,7 @@ class QrCodeScannerActivity : AppCompatActivity() {
         val BAR_COLOR = "BAR_COLOR"
         val QR_CORNER_COLOR = "QR_CORNER_COLOR"
         val QR_SCANNER_COLOR = "QR_SCANNER_COLOR"
+        val SCAN_AREA_SCALE = "SCAN_AREA_SCALE";
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,27 +56,30 @@ class QrCodeScannerActivity : AppCompatActivity() {
     }
 
     fun goToScanFragment() {
-        val intent = intent
-        val fm = supportFragmentManager
+         intent?.let{
+            val fm = supportFragmentManager
 
-        //是否有閃光燈按鈕
-        var hasFlashLight = true
-        if ("0" == intent.getStringExtra(FLASHLIGHT)) {
-            hasFlashLight = false
+            //是否有閃光燈按鈕
+            var hasFlashLight = true
+            if ("0" == it.getStringExtra(FLASHLIGHT)) {
+                hasFlashLight = false
+            }
+
+            val scanAreaScale = it.getStringExtra(SCAN_AREA_SCALE)?.toFloat() ?: 0.7F
+            
+            val scanFragment = ScanFragment.newInstance(
+                    title = intent.getStringExtra(TITLE),
+                    hasFlashLight = hasFlashLight,
+                    toolBarColor = findColorByBundle(BAR_COLOR),
+                    titleColor = findColorByBundle(TITLE_COLOR),
+                    qrCornerColor = findColorByBundle(QR_CORNER_COLOR),
+                    qrScanColor = findColorByBundle(QR_SCANNER_COLOR),
+                    scanAreaScale = scanAreaScale
+            )
+
+            fm?.beginTransaction()?.replace(R.id.fragment_container, scanFragment, ScanFragment::class.java.simpleName)?.commitAllowingStateLoss()
         }
-
-        val scanFragment = ScanFragment.newInstance(
-                title = intent.getStringExtra(TITLE),
-                hasFlashLight = hasFlashLight,
-                toolBarColor = findColorByBundle(BAR_COLOR),
-                titleColor = findColorByBundle(TITLE_COLOR),
-                qrCornerColor = findColorByBundle(QR_CORNER_COLOR),
-                qrScanColor = findColorByBundle(QR_SCANNER_COLOR)
-        )
-
-        fm?.beginTransaction()?.replace(R.id.fragment_container, scanFragment, ScanFragment::class.java.simpleName)?.commitAllowingStateLoss()
     }
-
     private fun findColorByBundle(bundleKey: String): Int {
         var color = 0
         val stringTitleColor = intent.getStringExtra(bundleKey)
