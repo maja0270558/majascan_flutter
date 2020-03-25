@@ -15,7 +15,7 @@ enum MAJAScanArguKey: String {
     case flashLightEnable = "FLASHLIGHT"
     case squareColor = "QR_CORNER_COLOR"
     case scannerColor = "QR_SCANNER_COLOR"
-    
+    case scanAreaScale = "SCAN_AREA_SCALE"
     func getKeyValue<T>(dictionary: NSDictionary) -> T? {
         guard let result =  dictionary[self.rawValue] as? T else {
             return nil
@@ -51,7 +51,7 @@ class MAJAScannerController: UIViewController {
     var flashLightEnable: Bool = true
     var backImage: UIImage?
     var flashlightImage: UIImage?
-    
+    var scanAreaScale: Double?
     /*
      Life cycle
      */
@@ -74,7 +74,7 @@ class MAJAScannerController: UIViewController {
                 self.previewLayer.videoGravity = .resizeAspectFill
                 self.view.layer.addSublayer(self.previewLayer)
                 /// overlay rect
-                self.crosshairView = CrosshairView(frame: UIScreen.main.bounds, color: self.squareColor, scannerColor: self.scannerColor)
+                self.crosshairView = CrosshairView(frame: UIScreen.main.bounds, color: self.squareColor, scannerColor: self.scannerColor, scale: self.scanAreaScale ?? 0.7)
                 self.view.addSubview(self.crosshairView!)
                 self.crosshairView.autoLayout.fillSuperview()
                 //            guard let output = metadataOutput else {
@@ -251,6 +251,10 @@ class MAJAScannerController: UIViewController {
         if let flashLightEnableString: String = MAJAScanArguKey.flashLightEnable.getKeyValue(dictionary: argumentDictionary), let enableInt = Int(flashLightEnableString)  {
             
             flashLightEnable = enableInt == 0 ? false : true
+        }
+        
+        if let scale: String = MAJAScanArguKey.scanAreaScale.getKeyValue(dictionary: argumentDictionary)  {
+            scanAreaScale = Double(scale) ?? 0.7
         }
     }
     

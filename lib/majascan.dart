@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 
@@ -15,12 +16,14 @@ class MajaScan {
     Color titleColor,
     Color qRCornerColor,
     Color qRScannerColor,
+    double scanAreaScale = 0.7,
   }) async {
     int flashlight = (flashlightEnable ? 1 : 0);
 
     Map<String, String> scanArgs = {
       ScanArgs.TITLE: title,
       ScanArgs.FLASHLIGHT: flashlight.toString(),
+      ScanArgs.SCAN_AREA_SCALE: scanAreaScale.toString(), 
     };
 
     if (barColor != null) {
@@ -53,4 +56,5 @@ class ScanArgs {
   static const BAR_COLOR = "BAR_COLOR";
   static const QR_CORNER_COLOR = "QR_CORNER_COLOR";
   static const QR_SCANNER_COLOR = "QR_SCANNER_COLOR";
+  static const SCAN_AREA_SCALE = "SCAN_AREA_SCALE";
 }

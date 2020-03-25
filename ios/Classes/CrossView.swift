@@ -8,7 +8,7 @@ class CrosshairView: UIView {
     }
 
     var squareWidth: CGFloat {
-        return minDistance * 0.7
+        return minDistance * CGFloat(scale)
     }
     
     var cornerWidth: CGFloat {
@@ -41,11 +41,13 @@ class CrosshairView: UIView {
     var scanGradientLayer = CAGradientLayer()
     var color: UIColor!
     var scannerColor: UIColor!
-
-    convenience init(frame: CGRect,color: UIColor = UIColor.orange, scannerColor:UIColor = UIColor.orange)  {
+    var scale: Double!
+    
+    convenience init(frame: CGRect,color: UIColor = UIColor.orange, scannerColor:UIColor = UIColor.orange, scale: Double)  {
         self.init(frame: frame)
         self.color = color
         self.scannerColor = scannerColor
+        self.scale = scale
     }
     
     override init(frame: CGRect) {
