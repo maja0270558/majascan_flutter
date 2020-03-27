@@ -41,18 +41,25 @@ Add the QrCodeScannerActivity to your AndroidManifest.xml
 String qrResult = await MajaScan.startScan(
     title: “QRcode scanner”, 
     barColor: Colors.red, 
-  	titleColor: Colors.green, 
+    titleColor: Colors.green, 
     qRCornerColor: Colors.blue,
     qRScannerColor: Colors.deepPurple,
-	  flashlightEnable: true, 
-  	scanAreaScale: 0.7 /// value 0.0 to 1.0
-    );
+    flashlightEnable: true, 
+    scanAreaScale: 0.7 /// value 0.0 to 1.0
+);
 ```
  ### Parameters
+ 
  **title** : Navigation bar title.
+ 
  **barColor** : Navigation bar color.
+ 
  **titleColor** : Navigation bar title color (include back icon).
+ 
  **qRCornerColor** : Square color.
+ 
  **qRScannerColor** : Scanner line color.
+ 
  **flashlightEnable** : Flashlight button enable flag.
+ 
  **scanAreaScale** : Center scan area size scale.
