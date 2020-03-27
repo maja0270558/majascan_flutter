@@ -46,7 +46,7 @@ class MAJAScannerController: UIViewController {
     var barColor: UIColor = UIColor.clear
     var squareColor: UIColor = UIColor.orange
     var scannerColor: UIColor = UIColor.orange
-
+    
     var barTitle: String = Localizable.ScanPage.scannerTitle.localized  // "掃描 QRcode"
     var flashLightEnable: Bool = true
     var backImage: UIImage?
@@ -59,6 +59,37 @@ class MAJAScannerController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         settingArgumentValue()
+        
+        
+    }
+    
+    @objc func becomeActive() {
+        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
+        let videoInput: AVCaptureDeviceInput
+        do {
+            videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
+        } catch {
+            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
+            return
+        }
+        if (captureSession.canAddInput(videoInput)) {
+            captureSession.addInput(videoInput)
+        } else {
+            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
+            return
+        }
+        
+        previewLayerInit()
+    }
+    
+    @objc func resignActive() {
+        let inputs = captureSession!.inputs
+        for oldInput:AVCaptureInput in inputs {
+            captureSession?.removeInput(oldInput)
+        }
+    }
+    
+    @objc func appEnterForeground() {
     }
     
     func previewLayerInit(){
@@ -77,13 +108,7 @@ class MAJAScannerController: UIViewController {
                 self.crosshairView = CrosshairView(frame: UIScreen.main.bounds, color: self.squareColor, scannerColor: self.scannerColor, scale: self.scanAreaScale ?? 0.7)
                 self.view.addSubview(self.crosshairView!)
                 self.crosshairView.autoLayout.fillSuperview()
-                //            guard let output = metadataOutput else {
-                //                failed()
-                //                return
-                //            }
-                /// Rect limit
-                //            let rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: crosshairView.squareRect)
-                //            output.rectOfInterest = rectOfInterest
+                
             }
         }
     }
@@ -122,7 +147,8 @@ class MAJAScannerController: UIViewController {
         }) {
             self.failed(error: MAJAScanError.authorizationDenied(message: Localizable.ScanPage.cameraPermisionNonOpen.localized))
         }
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(becomeActive), name:UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(resignActive), name:UIApplication.willResignActiveNotification, object: nil)
         
     }
     

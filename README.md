@@ -13,7 +13,7 @@ Using method channel open native camera page scan qr code.
 Add this to your package's pubspec.yaml file:  
 ```  
 dependencies:  
-  majascan: ^0.3.5
+  majascan: ^0.3.6
 ```  
 ### 2. Install it  
 You can install packages from the command line:  
@@ -40,23 +40,19 @@ Add the QrCodeScannerActivity to your AndroidManifest.xml
  ```dart  
 String qrResult = await MajaScan.startScan(
     title: “QRcode scanner”, 
-	  barColor: Colors.red, 
+    barColor: Colors.red, 
   	titleColor: Colors.green, 
     qRCornerColor: Colors.blue,
     qRScannerColor: Colors.deepPurple,
-	  flashlightEnable: true
+	  flashlightEnable: true, 
+  	scanAreaScale: 0.7 /// value 0.0 to 1.0
     );
 ```
  ### Parameters
- 
  **title** : Navigation bar title.
-
  **barColor** : Navigation bar color.
-
  **titleColor** : Navigation bar title color (include back icon).
-
  **qRCornerColor** : Square color.
-
  **qRScannerColor** : Scanner line color.
-
  **flashlightEnable** : Flashlight button enable flag.
+ **scanAreaScale** : Center scan area size scale.

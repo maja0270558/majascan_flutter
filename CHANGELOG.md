@@ -1,3 +1,8 @@
+## 0.3.6
+
+* Add scan area scale parameter.
+* Fix iOS screelock camera preview freeze. 
+
 ## 0.3.5
 
 * podspec add swift version.
