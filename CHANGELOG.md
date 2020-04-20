@@ -1,3 +1,7 @@
+## 0.3.7
+
+* Fix iOS crash openning first time.
+
 ## 0.3.6
 
 * Add scan area scale parameter.
