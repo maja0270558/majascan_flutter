@@ -4,7 +4,7 @@ import AVFoundation
 
 enum MAJAScanError: Error {
     case authorizationDenied(message: String)
-    case deviceNotFount(message: String)
+    case deviceNotFound(message: String)
 }
 
 
@@ -24,17 +24,41 @@ enum MAJAScanArguKey: String {
     }
 }
 
+enum SessionSetupResult {
+    case success
+    case notAuthorized
+    case configurationFailed
+}
+
 protocol MAJAScannerDelegate: class {
     func didScanBarcodeWithResult(code: String)
     func didFailWithErrorCode(code: String)
 }
 
 class MAJAScannerController: UIViewController {
+    
+    var windowOrientation: UIInterfaceOrientation {
+        if #available(iOS 13.0, *) {
+            return view.window?.windowScene?.interfaceOrientation ?? .unknown
+        } else {
+            return UIApplication.shared.statusBarOrientation
+        }
+    }
+    
     weak var delegate: MAJAScannerDelegate?
+    
     // Camera
-    var captureSession: AVCaptureSession!
-    var metadataOutput: AVCaptureMetadataOutput!
-    var previewLayer: AVCaptureVideoPreviewLayer!
+    private let sessionQueue = DispatchQueue(label: "session queue")
+    private let session = AVCaptureSession()
+    private var isSessionRunning = false
+    private var setupResult: SessionSetupResult = .success
+    @objc dynamic var metadataOutput: AVCaptureMetadataOutput!
+    @objc dynamic var videoDeviceInput: AVCaptureDeviceInput!
+    
+ 
+    var previewView: PreviewView!
+
+    
     // Flutter
     var argumentDictionary: NSDictionary = [:]
     // UI
@@ -52,117 +76,227 @@ class MAJAScannerController: UIViewController {
     var backImage: UIImage?
     var flashlightImage: UIImage?
     var scanAreaScale: Double?
+    
+    
+    
     /*
      Life cycle
      */
     override  func viewDidLoad() {
         super.viewDidLoad()
+
         view.backgroundColor = UIColor.black
         settingArgumentValue()
+        configureNavigationBar()
+
+        // Init preview view
+        previewView = PreviewView()
+        view.addSubview(previewView)
         
+        crosshairView = CrosshairView(frame: UIScreen.main.bounds, color: self.squareColor, scannerColor: self.scannerColor, scale: self.scanAreaScale ?? 0.7)
+        previewView.addSubview(crosshairView!)
         
-    }
-    
-    @objc func becomeActive() {
-        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
-        let videoInput: AVCaptureDeviceInput
-        do {
-            videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
-        } catch {
-            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
-            return
-        }
-        if (captureSession.canAddInput(videoInput)) {
-            captureSession.addInput(videoInput)
-        } else {
-            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
-            return
-        }
+        // Autolayout
+        self.previewView.videoPreviewLayer.videoGravity = .resizeAspectFill
+        previewView.autoLayout.fillSuperview()
+        crosshairView.autoLayout.fillSuperview()
+       
+        // Setting camera
+        // Set up the video preview view.
+         previewView.session = session
         
-        previewLayerInit()
-    }
-    
-    @objc func resignActive() {
-        let inputs = captureSession!.inputs
-        for oldInput:AVCaptureInput in inputs {
-            captureSession?.removeInput(oldInput)
-        }
-    }
-    
-    @objc func appEnterForeground() {
-    }
-    
-    func previewLayerInit(){
-        if (captureSession?.isRunning == false) {
-            captureSession.startRunning()
-        }
-        if previewLayer == nil {
-            /// add preview layer
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
-                self.previewLayer.frame = self.view.bounds
-                self.previewLayer.videoGravity = .resizeAspectFill
-                self.view.layer.addSublayer(self.previewLayer)
-                /// overlay rect
-                self.crosshairView = CrosshairView(frame: UIScreen.main.bounds, color: self.squareColor, scannerColor: self.scannerColor, scale: self.scanAreaScale ?? 0.7)
-                self.view.addSubview(self.crosshairView!)
-                self.crosshairView.autoLayout.fillSuperview()
-                
-            }
-        }
-    }
-    
-    func checkCameraAuth(success: @escaping ()->Void, fail: @escaping () -> Void){
+        // Check auth
+        /*
+         Check the video authorization status. Video access is required and audio
+         access is optional. If the user denies audio access, AVCam won't
+         record audio during movie recording.
+         */
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized: // The user has previously granted access to the camera.
-            captureSessionInit()
-            success()
-        case .notDetermined: // The user has not yet been asked for camera access.
-            AVCaptureDevice.requestAccess(for: .video) { granted in
-                if granted {
-                    self.captureSessionInit()
-                    success()
-                } else {
-                    fail()
+        case .authorized:
+            // The user has previously granted access to the camera.
+            break
+            
+        case .notDetermined:
+            /*
+             The user has not yet been presented with the option to grant
+             video access. Suspend the session queue to delay session
+             setup until the access request has completed.
+             
+             Note that audio access will be implicitly requested when we
+             create an AVCaptureDeviceInput for audio during session setup.
+             */
+            sessionQueue.suspend()
+            AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
+                if !granted {
+                    self.setupResult = .notAuthorized
                 }
-            }
+                self.sessionQueue.resume()
+            })
             
-        case .denied: // The user has previously denied access.
-            fail()
-            return
-            
-        case .restricted: // The user can't grant access due to restrictions.
-            fail()
-            return
+        default:
+            // The user has previously denied access.
+            setupResult = .notAuthorized
         }
+        
+        /*
+                Setup the capture session.
+                In general, it's not safe to mutate an AVCaptureSession or any of its
+                inputs, outputs, or connections from multiple threads at the same time.
+                
+                Don't perform these tasks on the main queue because
+                AVCaptureSession.startRunning() is a blocking call, which can
+                take a long time. Dispatch session setup to the sessionQueue, so
+                that the main queue isn't blocked, which keeps the UI responsive.
+                */
+               sessionQueue.async {
+                   self.configureSession()
+               }
     }
     
     override  func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        configureNavigationBar()
-        updatePreviewLayerOrientation()
-        checkCameraAuth(success: {
-            self.previewLayerInit()
-        }) {
-            self.failed(error: MAJAScanError.authorizationDenied(message: Localizable.ScanPage.cameraPermisionNonOpen.localized))
-        }
-        NotificationCenter.default.addObserver(self, selector: #selector(becomeActive), name:UIApplication.didBecomeActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(resignActive), name:UIApplication.willResignActiveNotification, object: nil)
+              sessionQueue.async {
+                  switch self.setupResult {
+                  case .success:
+                      // Only setup observers and start the session if setup succeeded.
+                      self.addObservers()
+                      self.session.startRunning()
+                      self.isSessionRunning = self.session.isRunning
+                      
+                  case .notAuthorized:
+                      DispatchQueue.main.async {
+                       let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(Localizable.ScanPage.cameraPermisionNonOpen.localized)", preferredStyle: .alert)
+                                let confirmAction = UIAlertAction(title: Localizable.Global.go.localized, style: .default) { (action) in
+                                    UIApplication.shared.openURL(URL(string: UIApplication.openSettingsURLString)!)
+                                    self.dismiss(animated: true, completion: nil)
+                                }
+                                let cancelAction = UIAlertAction(title: Localizable.Global.cancel.localized, style: .default) { (action) in
+                                    self.dismiss(animated: true, completion: nil)
+                                }
+                                alertController.addAction(confirmAction)
+                                alertController.addAction(cancelAction)
+                        self.present(alertController, animated: true)
+                      }
+                      
+                  case .configurationFailed:
+                      DispatchQueue.main.async {
+                        let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(Localizable.ScanPage.deviceNotSupport.localized)", preferredStyle: .alert)
+                                    let confirmAction = UIAlertAction(title: Localizable.Global.confirm.localized, style: .default) { (action) in
+                                        self.dismiss(animated: true, completion: nil)
+                                    }
+                                    alertController.addAction(confirmAction)
+                            self.present(alertController, animated: true)
+                                    
+                      }
+                  }
+              }
+    }
+    
+    
+    
+    private func addObservers() {
         
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(sessionRuntimeError),
+                                               name: .AVCaptureSessionRuntimeError,
+                                               object: session)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(sessionWasInterrupted),
+                                               name: .AVCaptureSessionWasInterrupted,
+                                               object: session)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(sessionInterruptionEnded),
+                                               name: .AVCaptureSessionInterruptionEnded,
+                                               object: session)
+    }
+    
+    private func removeObservers() {
+           NotificationCenter.default.removeObserver(self)
+     }
+    
+    /// - Tag: HandleRuntimeError
+       @objc
+       func sessionRuntimeError(notification: NSNotification) {
+           guard let error = notification.userInfo?[AVCaptureSessionErrorKey] as? AVError else { return }
+           
+           print("Capture session runtime error: \(error)")
+           resumeInterruptedSession()
+           // If media services were reset, and the last start succeeded, restart the session.
+        if error.code == .mediaServicesWereReset {
+               sessionQueue.async {
+                   if self.isSessionRunning {
+                       self.session.startRunning()
+                       self.isSessionRunning = self.session.isRunning
+                   }
+               }
+           }
+       }
+    
+    /// - Tag: HandleInterruption
+    @objc
+    func sessionWasInterrupted(notification: NSNotification) {
+        /*
+         In some scenarios you want to enable the user to resume the session.
+         For example, if music playback is initiated from Control Center while
+         using AVCam, then the user can let AVCam resume
+         the session running, which will stop music playback. Note that stopping
+         music playback in Control Center will not automatically resume the session.
+         Also note that it's not always possible to resume, see `resumeInterruptedSession(_:)`.
+         */
+        if let userInfoValue = notification.userInfo?[AVCaptureSessionInterruptionReasonKey] as AnyObject?,
+            let reasonIntegerValue = userInfoValue.integerValue,
+            let reason = AVCaptureSession.InterruptionReason(rawValue: reasonIntegerValue) {
+            print("Capture session was interrupted with reason \(reason)")
+            
+            var showResumeButton = false
+            if reason == .audioDeviceInUseByAnotherClient || reason == .videoDeviceInUseByAnotherClient {
+                showResumeButton = true
+            } else if reason == .videoDeviceNotAvailableWithMultipleForegroundApps {
+                // Fade-in a label to inform the user that the camera is unavailable.
+//                cameraUnavailableLabel.alpha = 0
+//                cameraUnavailableLabel.isHidden = false
+//                UIView.animate(withDuration: 0.25) {
+//                    self.cameraUnavailableLabel.alpha = 1
+//                }
+            }
+            if showResumeButton {
+                resumeInterruptedSession()
+            }
+        }
+    }
+    
+    @objc
+    func sessionInterruptionEnded(notification: NSNotification) {
+        print("Capture session interruption ended")
+        resumeInterruptedSession()
+   
     }
     
     override  func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if (captureSession?.isRunning == true) {
-            captureSession.stopRunning()
+        sessionQueue.async {
+                  if self.setupResult == .success {
+                      self.session.stopRunning()
+                      self.isSessionRunning = self.session.isRunning
+                      self.removeObservers()
+                  }
         }
     }
     
-    override  func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updatePreviewLayerOrientation()
-    }
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+         super.viewWillTransition(to: size, with: coordinator)
+         
+         if let videoPreviewLayerConnection = previewView.videoPreviewLayer.connection {
+             let deviceOrientation = UIDevice.current.orientation
+             guard let newVideoOrientation = AVCaptureVideoOrientation(deviceOrientation: deviceOrientation),
+                 deviceOrientation.isPortrait || deviceOrientation.isLandscape else {
+                     return
+             }
+             
+             videoPreviewLayerConnection.videoOrientation = newVideoOrientation
+         }
+     }
     
     /*
      Init Method
@@ -176,48 +310,8 @@ class MAJAScannerController: UIViewController {
     }
     
     
-    private func updatePreviewLayerOrientation(){
-        if let connection =  self.previewLayer?.connection  {
-            let currentDevice: UIDevice = UIDevice.current
-            let orientation: UIDeviceOrientation = currentDevice.orientation
-            let previewLayerConnection : AVCaptureConnection = connection
-            
-            if previewLayerConnection.isVideoOrientationSupported {
-                switch (orientation) {
-                case .portrait: updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-                    break
-                case .landscapeRight: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
-                    break
-                case .landscapeLeft: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
-                    break
-                case .portraitUpsideDown: updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
-                    break
-                default:
-                    let statusBarOrientation = UIApplication.shared.statusBarOrientation
-                    switch statusBarOrientation {
-                    case .landscapeLeft:
-                        updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
-                    case .landscapeRight:
-                        updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
-                    case .portrait:
-                        updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-                    case .portraitUpsideDown:
-                        updatePreviewLayer(layer: previewLayerConnection, orientation: .portraitUpsideDown)
-                    case .unknown:
-                        updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-                    }
-                    break
-                }
-            }
-        }
-    }
-    
-    
-    private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
-        
-        layer.videoOrientation = orientation
-        
-        previewLayer.frame = self.view.bounds
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+           return .all
     }
     
     /*
@@ -319,81 +413,123 @@ class MAJAScannerController: UIViewController {
         navigationController?.navigationBar.titleTextAttributes = textAttributes
     }
     
-    func captureSessionInit(){
-        captureSession = AVCaptureSession()
-        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
-        let videoInput: AVCaptureDeviceInput
-        do {
-            videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
-        } catch {
-            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
-            return
-        }
-        if (captureSession.canAddInput(videoInput)) {
-            captureSession.addInput(videoInput)
-        } else {
-            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
-            return
-        }
-        metadataOutput = AVCaptureMetadataOutput()
-        if (captureSession.canAddOutput(metadataOutput)) {
-            captureSession.addOutput(metadataOutput)
-            metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-            metadataOutput.metadataObjectTypes = [.aztec, .code128, .code39, .code39Mod43, .code93, .dataMatrix, .ean13, .ean8, .interleaved2of5, .itf14, .pdf417, .qr]
-        } else {
-            failed(error: MAJAScanError.deviceNotFount(message: Localizable.ScanPage.deviceNotSupport.localized))
-            return
-        }
-        captureSession.startRunning()
-    }
-    
-    
-    func failed(error: MAJAScanError) {
-        
-        switch error {
-        case .authorizationDenied(let message):
-            let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(message)", preferredStyle: .alert)
-            let confirmAction = UIAlertAction(title: Localizable.Global.go.localized, style: .default) { (action) in
-                UIApplication.shared.openURL(URL(string: UIApplication.openSettingsURLString)!)
-                self.dismiss(animated: true, completion: nil)
-            }
-            let cancelAction = UIAlertAction(title: Localizable.Global.cancel.localized, style: .default) { (action) in
-                self.dismiss(animated: true, completion: nil)
-            }
-            alertController.addAction(confirmAction)
-            alertController.addAction(cancelAction)
-            present(alertController, animated: true)
-            
-        case .deviceNotFount(let message):
-            let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(message)", preferredStyle: .alert)
-            let confirmAction = UIAlertAction(title: Localizable.Global.confirm.localized, style: .default) { (action) in
-                self.dismiss(animated: true, completion: nil)
-            }
-            alertController.addAction(confirmAction)
-            present(alertController, animated: true)
-            
-        }
-        captureSession = nil
-    }
-    
     func success() {
         let ac = UIAlertController(title: "", message: Localizable.ScanPage.goImmediately.localized, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: Localizable.Global.cancel.localized, style: .default) { (action) in
-            self.captureSession.startRunning()
+            self.session.startRunning()
         }
         let confirmAction = UIAlertAction(title: Localizable.Global.go.localized, style: .default) { (action) in
-            self.captureSession.startRunning()
+            self.session.startRunning()
             self.dismiss(animated: true, completion: nil)
         }
         ac.addAction(cancelAction)
         ac.addAction(confirmAction)
         present(ac, animated: true)
     }
+    
+    private func configureSession() {
+           if setupResult != .success {
+               return
+           }
+           
+           session.beginConfiguration()
+        
+           // Add video input.
+           do {
+               var defaultVideoDevice: AVCaptureDevice?
+                              
+               if let cameraDevice =  AVCaptureDevice.default(for: .video)  {
+                   defaultVideoDevice = cameraDevice
+               }
+            
+               guard let videoDevice = defaultVideoDevice else {
+                   print("Default video device is unavailable.")
+                   setupResult = .configurationFailed
+                   session.commitConfiguration()
+                   return
+               }
+               let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
+               
+               if session.canAddInput(videoDeviceInput) {
+                   session.addInput(videoDeviceInput)
+                   self.videoDeviceInput = videoDeviceInput
+                   
+                   DispatchQueue.main.async {
+                       /*
+                        Dispatch video streaming to the main queue because AVCaptureVideoPreviewLayer is the backing layer for PreviewView.
+                        You can manipulate UIView only on the main thread.
+                        Note: As an exception to the above rule, it's not necessary to serialize video orientation changes
+                        on the AVCaptureVideoPreviewLayer’s connection with other session manipulation.
+                        
+                        Use the window scene's orientation as the initial video orientation. Subsequent orientation changes are
+                        handled by CameraViewController.viewWillTransition(to:with:).
+                        */
+                       var initialVideoOrientation: AVCaptureVideoOrientation = .portrait
+                       if self.windowOrientation != .unknown {
+                                          if let videoOrientation = AVCaptureVideoOrientation(interfaceOrientation: self.windowOrientation) {
+                                              initialVideoOrientation = videoOrientation
+                                          }
+                       }
+                    
+                       self.previewView.videoPreviewLayer.connection?.videoOrientation = initialVideoOrientation
+                   }
+               } else {
+                   print("Couldn't add video device input to the session.")
+                   setupResult = .configurationFailed
+                   session.commitConfiguration()
+                   return
+               }
+           } catch {
+               print("Couldn't create video device input: \(error)")
+               setupResult = .configurationFailed
+               session.commitConfiguration()
+               return
+           }
+           
+           // Add the metadatta output.
+            metadataOutput = AVCaptureMetadataOutput()
+           
+        
+           if session.canAddOutput(metadataOutput) {
+               session.addOutput(metadataOutput)
+               metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+               metadataOutput.metadataObjectTypes = [.aztec, .code128, .code39, .code39Mod43, .code93, .dataMatrix, .ean13, .ean8, .interleaved2of5, .itf14, .pdf417, .qr]
+           } else {
+               print("Could not add photo output to the session")
+               setupResult = .configurationFailed
+               session.commitConfiguration()
+               return
+           }
+           
+           session.commitConfiguration()
+       }
+    
+        @IBAction private func resumeInterruptedSession() {
+          sessionQueue.async {
+              /*
+               The session might fail to start running, for example, if a phone or FaceTime call is still
+               using audio or video. This failure is communicated by the session posting a
+               runtime error notification. To avoid repeatedly failing to start the session,
+               only try to restart the session in the error handler if you aren't
+               trying to resume the session.
+               */
+              self.session.startRunning()
+              self.isSessionRunning = self.session.isRunning
+              if !self.session.isRunning {
+                  DispatchQueue.main.async {
+                      let alertController = UIAlertController(title: "", message: "Unable to resume", preferredStyle: .alert)
+                      let cancelAction = UIAlertAction(title: NSLocalizedString("\(Localizable.Global.confirm.localized)", comment: ""), style: .cancel, handler: nil)
+                      alertController.addAction(cancelAction)
+                      self.present(alertController, animated: true, completion: nil)
+                  }
+              }
+          }
+      }
 }
 
 extension MAJAScannerController: AVCaptureMetadataOutputObjectsDelegate{
     @objc func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-        captureSession.stopRunning()
+        session.stopRunning()
         if let metadataObject = metadataObjects.first {
             guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
             guard let stringValue = readableObject.stringValue else { return }
@@ -405,3 +541,24 @@ extension MAJAScannerController: AVCaptureMetadataOutputObjectsDelegate{
     
 }
 
+extension AVCaptureVideoOrientation {
+    init?(deviceOrientation: UIDeviceOrientation) {
+        switch deviceOrientation {
+        case .portrait: self = .portrait
+        case .portraitUpsideDown: self = .portraitUpsideDown
+        case .landscapeLeft: self = .landscapeRight
+        case .landscapeRight: self = .landscapeLeft
+        default: return nil
+        }
+    }
+    
+    init?(interfaceOrientation: UIInterfaceOrientation) {
+        switch interfaceOrientation {
+        case .portrait: self = .portrait
+        case .portraitUpsideDown: self = .portraitUpsideDown
+        case .landscapeLeft: self = .landscapeLeft
+        case .landscapeRight: self = .landscapeRight
+        default: return nil
+        }
+    }
+}

@@ -19,5 +19,5 @@
 
 "go" = "前往";
 
-"deviceNotSupport" = "目前裝置不支援 QR code 掃描";
+"deviceNotSupport" = "設置相機時發生錯誤";
 

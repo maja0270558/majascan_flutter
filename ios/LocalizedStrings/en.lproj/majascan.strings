@@ -4,5 +4,5 @@
 "scannerTitle" = "Scan QRCode";
 "goImmediately" = "Do you want to go immediately?";
 "go" = "GO";
-"deviceNotSupport" = "Current device is not supported";
+"deviceNotSupport" = "Something goes wrong during capture session configuration";
 
