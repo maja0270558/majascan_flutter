@@ -1,6 +1,10 @@
+## 0.3.8
+
+* Fix toolbar back buttons and declined permissions not completing scan future. It now completes with an empty String.
+
 ## 0.3.7
 
-* Fix iOS crash openning first time.
+* Fix iOS crash opening first time.
 
 ## 0.3.6
 

@@ -13,6 +13,7 @@ import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import com.djgeo.majascan.R
 
+
 class QrCodeScannerActivity : AppCompatActivity() {
 
     companion object {
@@ -108,7 +109,7 @@ class QrCodeScannerActivity : AppCompatActivity() {
             if (fm != null) {
                 val fragment = fm.findFragmentByTag(ScanFragment::class.java.simpleName)
                 if (fragment is ScanFragment) {
-                    finish()
+                    receiveAndSetResult("")
                     return true
                 }
             }

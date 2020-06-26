@@ -168,10 +168,10 @@ class MAJAScannerController: UIViewController {
                        let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(Localizable.ScanPage.cameraPermisionNonOpen.localized)", preferredStyle: .alert)
                                 let confirmAction = UIAlertAction(title: Localizable.Global.go.localized, style: .default) { (action) in
                                     UIApplication.shared.openURL(URL(string: UIApplication.openSettingsURLString)!)
-                                    self.dismiss(animated: true, completion: nil)
+                                    self.dismissWithoutResult()
                                 }
                                 let cancelAction = UIAlertAction(title: Localizable.Global.cancel.localized, style: .default) { (action) in
-                                    self.dismiss(animated: true, completion: nil)
+                                    self.dismissWithoutResult()
                                 }
                                 alertController.addAction(confirmAction)
                                 alertController.addAction(cancelAction)
@@ -182,7 +182,7 @@ class MAJAScannerController: UIViewController {
                       DispatchQueue.main.async {
                         let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(Localizable.ScanPage.deviceNotSupport.localized)", preferredStyle: .alert)
                                     let confirmAction = UIAlertAction(title: Localizable.Global.confirm.localized, style: .default) { (action) in
-                                        self.dismiss(animated: true, completion: nil)
+                                        self.dismissWithoutResult()
                                     }
                                     alertController.addAction(confirmAction)
                             self.present(alertController, animated: true)
@@ -318,6 +318,11 @@ class MAJAScannerController: UIViewController {
      Button action
      */
     @objc func backAction() -> Void {
+        dismissWithoutResult()
+    }
+
+    func dismissWithoutResult() -> Void {
+        delegate?.didScanBarcodeWithResult(code: "")
         self.dismiss(animated: true, completion: nil)
     }
     

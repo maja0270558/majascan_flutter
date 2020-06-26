@@ -103,7 +103,7 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
 
         //關閉按鈕
         mBackBtn = view.findViewById(R.id.back_btn)
-        mBackBtn?.setOnClickListener { activity?.finish() }
+        mBackBtn?.setOnClickListener { finishActivityWithoutResult() }
 
         handleBundleData()
     }
@@ -166,7 +166,7 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
                 if (cameraAccepted) {
                     startScan()
                 } else {
-                    activity?.finish()
+                    finishActivityWithoutResult()
                 }
             }
         }
@@ -177,13 +177,17 @@ class ScanFragment : Fragment(), ScanInteractorImpl.ScanCallbackInterface {
             AlertDialog.Builder(it)
                     .setMessage(getString(R.string.camera_permission_tips))
                     .setPositiveButton(getString(R.string.dialog_btn_go)) { _, _ -> activity?.let { PermissionUtil.goToSettingPermission(activity!!) } }
-                    .setNegativeButton(getString(R.string.dialog_btn_cancel)) { _, _ -> activity?.finish() }
+                    .setNegativeButton(getString(R.string.dialog_btn_cancel)) { _, _ -> finishActivityWithoutResult() }
                     .setCancelable(false)
                     .create()
                     .show()
         }
     }
 
+    private fun finishActivityWithoutResult() {
+        val activity = activity as QrCodeScannerActivity? ?: return
+        activity?.receiveAndSetResult("")
+    }
 
     override fun onStart() {
         super.onStart()
