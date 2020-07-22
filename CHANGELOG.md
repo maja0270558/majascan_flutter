@@ -1,6 +1,7 @@
 ## 0.3.8
 
 * Fix toolbar back buttons and declined permissions not completing scan future. It now completes with an empty String.
+* Fix compatibility with `com.android.tools.build:gradle:4+`
 
 ## 0.3.7
 
