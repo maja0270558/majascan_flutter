@@ -57,7 +57,7 @@ class JumpPermissionManagement {
         fun Huawei(context: Context) {
             val intent = Intent()
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+            intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME)
             val comp = ComponentName("com.huawei.systemmanager", "com.huawei.permissionmanager.ui.MainActivity")
             intent.component = comp
             context.startActivity(intent)
@@ -66,7 +66,7 @@ class JumpPermissionManagement {
         fun Meizu(context: Context) {
             val intent = Intent("com.meizu.safe.security.SHOW_APPSEC")
             intent.addCategory(Intent.CATEGORY_DEFAULT)
-            intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+            intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME)
             context.startActivity(intent)
         }
 
@@ -74,14 +74,14 @@ class JumpPermissionManagement {
             val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
             val componentName = ComponentName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity")
             intent.component = componentName
-            intent.putExtra("extra_pkgname", BuildConfig.APPLICATION_ID)
+            intent.putExtra("extra_pkgname", BuildConfig.LIBRARY_PACKAGE_NAME)
             context.startActivity(intent)
         }
 
         fun Sony(context: Context) {
             val intent = Intent()
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+            intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME)
             val comp = ComponentName("com.sonymobile.cta", "com.sonymobile.cta.SomcCTAMainActivity")
             intent.component = comp
             context.startActivity(intent)
@@ -90,7 +90,7 @@ class JumpPermissionManagement {
         fun OPPO(context: Context) {
             val intent = Intent()
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+            intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME)
             val comp = ComponentName("com.color.safecenter", "com.color.safecenter.permission.PermissionManagerActivity")
             intent.component = comp
             context.startActivity(intent)
@@ -99,7 +99,7 @@ class JumpPermissionManagement {
         fun LG(activity: Context) {
             val intent = Intent("android.intent.action.MAIN")
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+            intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME)
             val comp = ComponentName("com.android.settings", "com.android.settings.Settings\$AccessLockSummaryActivity")
             intent.component = comp
             activity.startActivity(intent)
@@ -108,7 +108,7 @@ class JumpPermissionManagement {
         fun Letv(context: Context) {
             val intent = Intent()
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+            intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME)
             val comp = ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.PermissionAndApps")
             intent.component = comp
             context.startActivity(intent)
@@ -120,7 +120,7 @@ class JumpPermissionManagement {
         fun _360(context: Activity) {
             val intent = Intent("android.intent.action.MAIN")
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+            intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME)
             val comp = ComponentName("com.qihoo360.mobilesafe", "com.qihoo360.mobilesafe.ui.index.AppEnterActivity")
             intent.component = comp
             context.startActivity(intent)

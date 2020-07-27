@@ -1,6 +1,7 @@
 ## 0.3.8
 
 * Fix toolbar back buttons and declined permissions not completing scan future. It now completes with an empty String.
+* Fix compatibility with `com.android.tools.build:gradle:4+`
 * Fix plugin not working in Android headless mode
 
 ## 0.3.7
