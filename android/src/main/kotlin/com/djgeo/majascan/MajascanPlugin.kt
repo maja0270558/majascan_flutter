@@ -11,24 +11,29 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-class MajascanPlugin(activity: Activity) : MethodCallHandler, PluginRegistry.ActivityResultListener {
+class MajascanPlugin(val activity: Activity) : MethodCallHandler, PluginRegistry.ActivityResultListener {
 
     companion object {
         @JvmStatic
         fun registerWith(registrar: Registrar) {
-            val majascanPlugin = MajascanPlugin(registrar.activity())
-            val channel = MethodChannel(registrar.messenger(), "majascan")
-            channel.setMethodCallHandler(majascanPlugin)
+            registrar.activity()?.let {
+                // If a background flutter view tries to register the plugin,
+                // there will be no activity from the registrar,
+                // we stop the registering process immediately because the plugin requires an activity.
 
-            // 注册ActivityResult回调
-            registrar.addActivityResultListener(majascanPlugin)
+                val majascanPlugin = MajascanPlugin(it)
+                val channel = MethodChannel(registrar.messenger(), "majascan")
+                channel.setMethodCallHandler(majascanPlugin)
+
+                // 注册ActivityResult回调
+                registrar.addActivityResultListener(majascanPlugin)
+            }
         }
 
         const val SCANRESULT = "scan"
         const val Request_Scan = 1
     }
 
-    private var activity: Activity? = activity
     private var mResult: Result? = null
     private var mResultPeriod = 0L
 
@@ -37,7 +42,7 @@ class MajascanPlugin(activity: Activity) : MethodCallHandler, PluginRegistry.Act
         when (call.method) {
             SCANRESULT -> {
                 val args: Map<String, String>? = call.arguments()
-                activity?.let {
+                activity.let {
                     val intent = Intent(it, QrCodeScannerActivity::class.java)
                     args?.keys?.map { key -> intent.putExtra(key, args[key]) }
                     it.startActivityForResult(intent, Request_Scan)
