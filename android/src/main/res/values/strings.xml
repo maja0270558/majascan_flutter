@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">G_scanner</string>
     <string name="scanner_title">Scan QRCode</string>
     <string name="camera_permission_tips">It looks like your privacy settings are preventing us from accessing your camera to do scanning. You can fix this by doing the following:\n\n1. Touch the Setting button below to open the Settings app.\n\n2. Turn the Camera on.\n\n3. Open this app and try again.</string>
     <string name="go_to_webview">Do you want to go immediately?</string>

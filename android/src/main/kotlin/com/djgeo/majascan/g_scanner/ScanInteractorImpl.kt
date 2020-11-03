@@ -79,8 +79,5 @@ class ScanInteractorImpl(private val mCallback: ScanCallbackInterface?) : ScanIn
     override fun handleResult(result: Result) {
         val text = result.text
         mCallback?.receiveResult(text)
-
-        // If you would like to resume scanning, call this method below:
-        mZXingScannerView!!.resumeCameraPreview(this)
     }
 }
