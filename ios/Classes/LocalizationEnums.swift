@@ -8,7 +8,7 @@
 import Foundation
 
 /**
- usege: title.text = Localizable.ScanPage.scannerTitle.localized
+ usage: title.text = Localizable.ScanPage.scannerTitle.localized
  */
 enum Localizable {
     

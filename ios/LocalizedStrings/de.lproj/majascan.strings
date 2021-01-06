@@ -1,0 +1,9 @@
+"cancel" = "Abbrechen";
+"confirm" = "Bestätigen";
+"cameraPermisionNonOpen" = "Ihre Privatssphäre-Einstellungen verhindern den Zugriff auf die Kamera, die zum Abscannen benötigt wird.
+Um den QR-Code zu scannen, wird die Kamera-Berechtigung benötigt. Um die Berechtigung zu erteilen,
+gehen Sie zu den Einstellungen, genehmigen Sie den Zugriff auf die Kamera und starten die App erneut.";
+"scannerTitle" = "QRCode scannen";
+"goImmediately" = "Direkt zum WebView?";
+"go" = "Einstellungen";
+"deviceNotSupport" = "Diese Kamera wird nicht unterstützt.";
