@@ -1,0 +1,11 @@
+<resources>
+    <string name="scanner_title">QRCode scannen</string>
+    <string name="camera_permission_tips">
+        Ihre Privatssphäre-Einstellungen verhindern den Zugriff auf die Kamera, die zum Abscannen benötigt wird.
+        Um den QR-Code zu scannen, wird die Kamera-Berechtigung benötigt. Um die Berechtigung zu erteilen,
+        gehen Sie zu den Einstellungen, genehmigen Sie den Zugriff auf die Kamera und starten die App erneut.
+        </string>
+    <string name="go_to_webview">Privatssphäre-Einstellungen</string>
+    <string name="dialog_btn_go">Einstellungen</string>
+    <string name="dialog_btn_cancel">Abbrechen</string>
+</resources>
