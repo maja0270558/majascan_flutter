@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="majascan_example">
         <activity
@@ -24,13 +23,14 @@
                  until Flutter renders its first frame. It can be removed if
                  there is no splash screen (such as the default splash screen
                  defined in @style/LaunchTheme). -->
-            <meta-data
-                android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
-                android:value="true" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="flutterEmbedding"
+                android:value="2" />
         </activity>
         <activity
             android:name="com.djgeo.majascan.g_scanner.QrCodeScannerActivity"
