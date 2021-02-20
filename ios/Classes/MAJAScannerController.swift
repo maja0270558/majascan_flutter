@@ -167,7 +167,7 @@ class MAJAScannerController: UIViewController {
                       DispatchQueue.main.async {
                        let alertController = UIAlertController(title: Localizable.ScanPage.scannerTitle.localized, message: "\(Localizable.ScanPage.cameraPermisionNonOpen.localized)", preferredStyle: .alert)
                                 let confirmAction = UIAlertAction(title: Localizable.Global.go.localized, style: .default) { (action) in
-                                    UIApplication.shared.openURL(URL(string: UIApplication.openSettingsURLString)!)
+                                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                                     self.dismissWithoutResult()
                                 }
                                 let cancelAction = UIAlertAction(title: Localizable.Global.cancel.localized, style: .default) { (action) in
