@@ -20,8 +20,8 @@ class PermissionUtil {
 
     companion object {
 
-        private val TAG = PermissionUtil::class.java.simpleName
-        private val CHECK_PERMISSION = "CHECK_PERMISSION"
+        private val TAG : String = PermissionUtil::class.java.simpleName
+        private const val CHECK_PERMISSION : String = "CHECK_PERMISSION"
 
         const val Permission_denied_forever = -1
         const val Permission_denied = 0
@@ -52,7 +52,7 @@ class PermissionUtil {
             try {
                 JumpPermissionManagement.goToSetting(context)
             } catch (e: Exception) {
-                Log.e(TAG, e.message)
+                Log.e(TAG, e.message!!)
                 JumpPermissionManagement.ApplicationInfo(context)
             }
 

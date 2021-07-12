@@ -18,19 +18,19 @@ class QrCodeScannerActivity : AppCompatActivity() {
 
     companion object {
 
-        val REQUEST_CAMERA = 1
+        const val REQUEST_CAMERA = 1
 
         //bundle key
-        val BUNDLE_SCAN_CALLBACK = "BUNDLE_SCAN_CALLBACK"
+        const val BUNDLE_SCAN_CALLBACK = "BUNDLE_SCAN_CALLBACK"
 
         //key from flutter
-        val FLASHLIGHT = "FLASHLIGHT"
-        val TITLE = "TITLE"
-        val TITLE_COLOR = "TITLE_COLOR"
-        val BAR_COLOR = "BAR_COLOR"
-        val QR_CORNER_COLOR = "QR_CORNER_COLOR"
-        val QR_SCANNER_COLOR = "QR_SCANNER_COLOR"
-        val SCAN_AREA_SCALE = "SCAN_AREA_SCALE";
+        const val FLASHLIGHT = "FLASHLIGHT"
+        const val TITLE : String = "TITLE"
+        const val TITLE_COLOR = "TITLE_COLOR"
+        const val BAR_COLOR = "BAR_COLOR"
+        const val QR_CORNER_COLOR = "QR_CORNER_COLOR"
+        const val QR_SCANNER_COLOR = "QR_SCANNER_COLOR"
+        const val SCAN_AREA_SCALE = "SCAN_AREA_SCALE";
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,11 +53,11 @@ class QrCodeScannerActivity : AppCompatActivity() {
     fun goToWebviewFragment(url: String, webTitle: String) {
         val fm = supportFragmentManager
         val webViewFragment = WebViewFragment.newInstance(url, webTitle)
-        fm?.beginTransaction()?.replace(R.id.fragment_container, webViewFragment)?.addToBackStack(WebViewFragment::class.java.simpleName)?.commitAllowingStateLoss()
+        fm.beginTransaction().replace(R.id.fragment_container, webViewFragment)?.addToBackStack(WebViewFragment::class.java.simpleName)?.commitAllowingStateLoss()
     }
 
     fun goToScanFragment() {
-         intent?.let{
+        intent?.let{
             val fm = supportFragmentManager
 
             //是否有閃光燈按鈕
@@ -67,9 +67,9 @@ class QrCodeScannerActivity : AppCompatActivity() {
             }
 
             val scanAreaScale = it.getStringExtra(SCAN_AREA_SCALE)?.toFloat() ?: 0.7F
-            
+
             val scanFragment = ScanFragment.newInstance(
-                    title = intent.getStringExtra(TITLE),
+                    title = intent.getStringExtra(TITLE)!!,
                     hasFlashLight = hasFlashLight,
                     toolBarColor = findColorByBundle(BAR_COLOR),
                     titleColor = findColorByBundle(TITLE_COLOR),
@@ -78,13 +78,13 @@ class QrCodeScannerActivity : AppCompatActivity() {
                     scanAreaScale = scanAreaScale
             )
 
-            fm?.beginTransaction()?.replace(R.id.fragment_container, scanFragment, ScanFragment::class.java.simpleName)?.commitAllowingStateLoss()
+            fm.beginTransaction().replace(R.id.fragment_container, scanFragment, ScanFragment::class.java.simpleName)?.commitAllowingStateLoss()
         }
     }
     private fun findColorByBundle(bundleKey: String): Int {
         var color = 0
         val stringTitleColor = intent.getStringExtra(bundleKey)
-        if (!TextUtils.isEmpty(stringTitleColor) && stringTitleColor.indexOf("#") == 0) {
+        if (!TextUtils.isEmpty(stringTitleColor) && stringTitleColor!!.indexOf("#") == 0) {
             try {
                 color = Color.parseColor(stringTitleColor)
             } catch (e: Exception) {
@@ -106,12 +106,10 @@ class QrCodeScannerActivity : AppCompatActivity() {
         //攔截back鍵事件，如果是在ScanFragment就強制finish();
         if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
             val fm = supportFragmentManager
-            if (fm != null) {
-                val fragment = fm.findFragmentByTag(ScanFragment::class.java.simpleName)
-                if (fragment is ScanFragment) {
-                    receiveAndSetResult("")
-                    return true
-                }
+            val fragment = fm.findFragmentByTag(ScanFragment::class.java.simpleName)
+            if (fragment is ScanFragment) {
+                receiveAndSetResult("")
+                return true
             }
         }
         return super.onKeyUp(keyCode, event)
@@ -120,11 +118,9 @@ class QrCodeScannerActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         val fm = supportFragmentManager
-        if (fm != null) {
-            val fragment = fm.findFragmentByTag(ScanFragment::class.java.simpleName)
-            if (fragment is ScanFragment) {
-                fragment.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            }
+        val fragment = fm.findFragmentByTag(ScanFragment::class.java.simpleName)
+        if (fragment is ScanFragment) {
+            fragment.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
 
     }

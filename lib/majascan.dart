@@ -9,13 +9,13 @@ class MajaScan {
   static const MethodChannel _channel = const MethodChannel('majascan');
   static const CameraAccessDenied = 'PERMISSION_NOT_GRANTED';
 
-  static Future<String> startScan({
+  static Future<String?> startScan({
     String title = "",
     bool flashlightEnable = true,
-    Color barColor,
-    Color titleColor,
-    Color qRCornerColor,
-    Color qRScannerColor,
+    Color? barColor,
+    Color? titleColor,
+    Color? qRCornerColor,
+    Color? qRScannerColor,
     double scanAreaScale = 0.7,
   }) async {
     int flashlight = (flashlightEnable ? 1 : 0);
@@ -44,7 +44,7 @@ class MajaScan {
       '#${qRScannerColor.value.toRadixString(16)}';
     }
 
-    final String result = await _channel.invokeMethod('scan', scanArgs);
+    final String? result = await _channel.invokeMethod('scan', scanArgs);
     return result;
   }
 }
