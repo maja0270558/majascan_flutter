@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:ui';
-import 'package:flutter/services.dart';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class MajaScan {

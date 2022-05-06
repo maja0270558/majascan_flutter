@@ -21,13 +21,13 @@ class HomePageState extends State<HomePage> {
 
   Future _scanQR() async {
     try {
-      String qrResult = await MajaScan.startScan(
+      String? qrResult = await MajaScan.startScan(
           title: "QRcode scanner",
           titleColor: Colors.amberAccent[700],
           qRCornerColor: Colors.orange,
           qRScannerColor: Colors.orange);
       setState(() {
-        result = qrResult;
+        result = qrResult ?? 'null string';
       });
     } on PlatformException catch (ex) {
       if (ex.code == MajaScan.CameraAccessDenied) {
