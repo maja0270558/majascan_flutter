@@ -1,3 +1,5 @@
+## 0.5.0
+* null-safety
 ## 0.3.8
 
 * Fix toolbar back buttons and declined permissions not completing scan future. It now completes with an empty String.

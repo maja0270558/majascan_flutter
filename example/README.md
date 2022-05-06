@@ -11,6 +11,12 @@ Using method channel open native camera page scan qr code.
   
 ### 1. Depend on it  
 Add this to your package's pubspec.yaml file:  
+null-safety:
+```  
+dependencies:  
+  majascan: ^0.5.0
+```  
+
 ```  
 dependencies:  
   majascan: ^0.4.0
